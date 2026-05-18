@@ -1,1 +1,0 @@
-#herda pessoa
