@@ -48,7 +48,8 @@ class Paciente(Pessoa):
     def idade(self, idade):
         self.__idade = idade
 
-    def idade_paciente(self):
+    def eh_maior_de_idade(self):
+        return self.__idade >= 18
 
 
 
