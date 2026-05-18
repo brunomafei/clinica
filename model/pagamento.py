@@ -2,4 +2,4 @@
 # PagamentoDinheiro
 # PagamentoPix
 # PagamentoCartao
-# Necessárias porque o sistema exige dados específicos para cada modalidade (como CPF no PIX ou Bandeira no Cartão).
+#  Os pagamentos devem ser realizados até a data do atendimento

@@ -40,6 +40,7 @@ class Paciente(Pessoa):
         self.__idade = idade
 
 #getter e setter, confirmação de idade do paciente
+
     @property
     def idade(self):
         return self.__idade

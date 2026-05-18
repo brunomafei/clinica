@@ -1,0 +1,1 @@
+# Os atendimentos devem ocorrer dentro do período de funcionamento da clínica
