@@ -2,7 +2,7 @@ from abc import ABC
 from datetime import date, time
 
 
-class Clinica:
+class Clinica: 
 
     def __init__(self,
                  nome: str,
