@@ -124,4 +124,4 @@ class Pagamento(ABC):
 
         else:
 
-            return "Pagamento em Dinheiro" cada modalidade (como CPF no PIX ou Bandeira no Cartão).
+            return "Pagamento em Dinheiro" # cada modalidade (como CPF no PIX ou Bandeira no Cartão).
