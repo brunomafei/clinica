@@ -1,59 +1,26 @@
+from abc import ABC, abstractmethod
+from datetime import date
+
+# Superclasse Abstrata
+
+
 class Pagamento(ABC):
-
-    def __init__(self,
-                 data_pagamento: date,
-                 atendimento,
-                 paciente,
-                 valor_pago: float,
-                 tipo_pagamento: str,
-                 cpf_pagador=None,
-                 numero_cartao=None,
-                 bandeira=None):
-
-        # regra do trabalho
-        if data_pagamento > atendimento.data:
-
+    def __init__(self, data: date, valor_pago: float, atendimento=None):
+        if atendimento and data > atendimento.data:
             raise ValueError(
-                "Pagamento deve ser realizado "
-                "até a data do atendimento."
-            )
+                "Pagamento deve ser realizado até a data do atendimento.")
 
-        self.__data_pagamento = data_pagamento
-        self.__atendimento = atendimento
-        self.__paciente = paciente
+        self.__data = data
         self.__valor_pago = valor_pago
-        self.__tipo_pagamento = tipo_pagamento
-
-        # PIX
-        self.__cpf_pagador = cpf_pagador
-
-        # CARTÃO
-        self.__numero_cartao = numero_cartao
-        self.__bandeira = bandeira
+        self.__atendimento = atendimento
 
     @property
-    def data_pagamento(self):
-        return self.__data_pagamento
+    def data(self):
+        return self.__data
 
-    @data_pagamento.setter
-    def data_pagamento(self, nova_data):
-        self.__data_pagamento = nova_data
-
-    @property
-    def atendimento(self):
-        return self.__atendimento
-
-    @atendimento.setter
-    def atendimento(self, novo_atendimento):
-        self.__atendimento = novo_atendimento
-
-    @property
-    def paciente(self):
-        return self.__paciente
-
-    @paciente.setter
-    def paciente(self, novo_paciente):
-        self.__paciente = novo_paciente
+    @data.setter
+    def data(self, nova_data):
+        self.__data = nova_data
 
     @property
     def valor_pago(self):
@@ -61,67 +28,61 @@ class Pagamento(ABC):
 
     @valor_pago.setter
     def valor_pago(self, novo_valor):
-
         if novo_valor < 0:
             raise ValueError("Valor inválido.")
-
         self.__valor_pago = novo_valor
 
+    def calcular_valor_restante(self):
+        if self.__atendimento:
+            return self.__atendimento.valor_total - self.__valor_pago
+        return 0
+
+    @abstractmethod
+    def __str__(self):
+        pass
+
+
+# Subclasse: Pagamento via PIX
+class Pagamento_pix(Pagamento):
+    def __init__(self, data: date, valor_pago: float, chave_pix: str, atendimento=None):
+        super().__init__(data, valor_pago, atendimento)
+        self.__chave_pix = chave_pix
+
     @property
-    def tipo_pagamento(self):
-        return self.__tipo_pagamento
+    def chave_pix(self):
+        return self.__chave_pix
 
-    @tipo_pagamento.setter
-    def tipo_pagamento(self, tipo):
-        self.__tipo_pagamento = tipo
+    @chave_pix.setter
+    def chave_pix(self, nova_chave):
+        self.__chave_pix = nova_chave
 
-    @property
-    def cpf_pagador(self):
-        return self.__cpf_pagador
+    def __str__(self):
+        return f"Pagamento PIX - Chave: {self.__chave_pix}"
 
-    @cpf_pagador.setter
-    def cpf_pagador(self, cpf):
-        self.__cpf_pagador = cpf
+
+# Subclasse: Pagamento via Cartão
+class Pagamento_cartao(Pagamento):
+    def __init__(self, data: date, valor_pago: float, numero_cartao: str, bandeira: str, atendimento=None):
+        super().__init__(data, valor_pago, atendimento)
+        self.__numero_cartao = numero_cartao
+        self.__bandeira = bandeira
 
     @property
     def numero_cartao(self):
         return self.__numero_cartao
 
-    @numero_cartao.setter
-    def numero_cartao(self, numero):
-        self.__numero_cartao = numero
-
     @property
     def bandeira(self):
         return self.__bandeira
 
-    @bandeira.setter
-    def bandeira(self, nova_bandeira):
-        self.__bandeira = nova_bandeira
+    def __str__(self):
+        return f"Pagamento Cartão - Bandeira: {self.__bandeira}"
 
-    def calcular_valor_restante(self):
 
-        return (
-            self.__atendimento.valor -
-            self.__valor_pago
-        )
+# Subclasse: Pagamento via Cédula (Dinheiro)
+class Pagamento_cedula(Pagamento):
+    def __init__(self, data: date, valor_pago: float, atendimento=None):
+        super().__init__(data, valor_pago, atendimento)
 
     def __str__(self):
-
-        if self.__tipo_pagamento == "PIX":
-
-            return (
-                f"Pagamento PIX - "
-                f"CPF: {self.__cpf_pagador}"
-            )
-
-        elif self.__tipo_pagamento == "CARTAO":
-
-            return (
-                f"Pagamento Cartão - "
-                f"Bandeira: {self.__bandeira}"
-            )
-
-        else:
-
-            return "Pagamento em Dinheiro" # cada modalidade (como CPF no PIX ou Bandeira no Cartão).
+        return "Pagamento em Cédula (Dinheiro)"

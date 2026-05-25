@@ -1,3 +1,6 @@
+from datetime import date, time
+
+
 class Atendimento:
 
     def __init__(self,
@@ -8,16 +11,10 @@ class Atendimento:
                  horario_inicio: time,
                  horario_fim: time,
                  tipo_atendimento: str,
-                 valor: float):
+                 valor_total: float):  
 
-        # regra do trabalho
-        if not clinica.horario_funcionamento(
-                horario_inicio,
-                horario_fim):
-
-            raise ValueError(
-                "Atendimento fora do horário da clínica."
-            )
+        if not clinica.horario_funcionamento(horario_inicio, horario_fim):
+            raise ValueError("Atendimento fora do horário da clínica.")
 
         self.__clinica = clinica
         self.__paciente = paciente
@@ -26,7 +23,7 @@ class Atendimento:
         self.__horario_inicio = horario_inicio
         self.__horario_fim = horario_fim
         self.__tipo_atendimento = tipo_atendimento
-        self.__valor = valor
+        self.__valor_total = valor_total 
 
     @property
     def clinica(self):
@@ -85,20 +82,14 @@ class Atendimento:
         self.__tipo_atendimento = tipo
 
     @property
-    def valor(self):
-        return self.__valor
+    def valor_total(self):
+        return self.__valor_total
 
-    @valor.setter
-    def valor(self, novo_valor):
-
+    @valor_total.setter
+    def valor_total(self, novo_valor):
         if novo_valor < 0:
             raise ValueError("Valor inválido.")
-
-        self.__valor = novo_valor
+        self.__valor_total = novo_valor
 
     def __str__(self):
-
-        return (
-            f"{self.__tipo_atendimento} "
-            f"- {self.__data}"
-        )
+        return f"{self.__tipo_atendimento} - {self.__data}"

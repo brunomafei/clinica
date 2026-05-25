@@ -1,8 +1,7 @@
-from abc import ABC
-from datetime import date, time
+from datetime import time
 
 
-class Clinica: 
+class Clinica:
 
     def __init__(self,
                  nome: str,
@@ -23,10 +22,8 @@ class Clinica:
 
     @nome.setter
     def nome(self, novo_nome):
-
         if novo_nome == "":
             raise ValueError("Nome inválido.")
-
         self.__nome = novo_nome
 
     @property
@@ -35,10 +32,8 @@ class Clinica:
 
     @cidade.setter
     def cidade(self, nova_cidade):
-
         if nova_cidade == "":
             raise ValueError("Cidade inválida.")
-
         self.__cidade = nova_cidade
 
     @property
@@ -65,19 +60,12 @@ class Clinica:
     def horario_fechamento(self, horario):
         self.__horario_fechamento = horario
 
-    # regra do trabalho
-    def horario_funcionamento(self,
-                              horario_inicio,
-                              horario_fim):
-
+    # Regra de negócio
+    def horario_funcionamento(self, horario_inicio, horario_fim):
         return (
             self.__horario_abertura <= horario_inicio and
             horario_fim <= self.__horario_fechamento
         )
 
     def __str__(self):
-
-        return (
-            f"Clínica: {self.__nome} "
-            f"- {self.__cidade}"
-        )
+        return f"Clínica: {self.__nome} - {self.__cidade}"
