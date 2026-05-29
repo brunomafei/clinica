@@ -1,4 +1,4 @@
-from clinica import Clinica
+from model.clinica import Clinica
 
 
 class ControladorClinica:
