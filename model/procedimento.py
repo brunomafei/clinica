@@ -1,6 +1,6 @@
 #   Além disso, deve ser possível registrar procedimentos ou serviços realizados durante o atendimento.
 #   Cada procedimento deve conter: descrição, custo, e profissional responsável.
-from pessoa import Profissional
+from model.pessoa import Profissional
 
 class Procedimento:
     def __init__(self, descricao: str, custo: float, profissional_responsavel: Profissional):

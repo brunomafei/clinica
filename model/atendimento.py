@@ -1,5 +1,7 @@
 from datetime import date, time
-
+from model.pessoa import Paciente
+from model.pessoa import Profissional
+from model.clinica import Clinica
 
 class Atendimento:
 

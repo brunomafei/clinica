@@ -82,10 +82,11 @@ class ControladorPessoa:
 
     def abre_tela(self):
         opcoes = {
-            1: self.incluir_pessoa, 
-            2: self.alterar_pessoa, 
-            3: self.listar_pessoas, 
-            4: self.excluir_pessoa, 
+            1: self.cadastrar_paciente, 
+            2: self.cadastrar_profissional, 
+            3: self.alterar_pessoa, 
+            4: self.listar_pessoas, 
+            5: self.remover_pessoa, 
             0: self.retornar
         }
         while True:
