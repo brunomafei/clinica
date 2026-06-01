@@ -75,3 +75,27 @@ class ControladorPessoa:
             self.__pessoas.remove(pessoa)
             return True
         return False
+
+# TELA ------------------------------------------------------------------------------------------------------------------
+    def retornar(self):
+        return
+
+    def abre_tela(self):
+        opcoes = {
+            1: self.incluir_pessoa, 
+            2: self.alterar_pessoa, 
+            3: self.listar_pessoas, 
+            4: self.excluir_pessoa, 
+            0: self.retornar
+        }
+        while True:
+            opcao = self.__tela_pessoa.tela_opcoes()
+            funcao = opcoes.get(opcao)
+            
+            if opcao == 0:
+                funcao() # type: ignore
+                break
+            elif funcao:
+                funcao()
+            else:
+                self.__tela_pessoa.mostra_mensagem("Opção inválida.")
