@@ -1,4 +1,4 @@
-from model.pessoa import Pessoa
+
 from model.pessoa import Paciente    
 from model.pessoa import Profissional
 from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
@@ -31,10 +31,12 @@ class ControladorPessoa:
         return profissional
 
 # LISTAGEM ------------------------------------------------------------------------------------------------------------------
+
     def listar_pessoas(self):
         return self.__pessoas
 
 # BUSCA --------------------------------------------------------------------------------------------------------------------- 
+
     def buscar_pessoa_por_cpf(self, cpf):
         for pessoa in self.__pessoas:
             
@@ -42,8 +44,10 @@ class ControladorPessoa:
                 return pessoa
         return None
     
-# ATUALIZAÇÃO ------------------------------------------------------------------------------------------------------------------    
+# ATUALIZAÇÃO ------------------------------------------------------------------------------------------------------------------   
+#  
     def alterar_pessoa(self, pessoa, novo_nome, novo_celular, novo_cpf, nova_idade=None, nova_especialidade=None, novo_registro=None):
+        #identifica se a pessoa existe na lista de pessoas, caso contrário lança uma exceção
         if pessoa not in self.__pessoas:
             raise ElementoNaoExisteException("Pessoa não encontrada no sistema.")
 

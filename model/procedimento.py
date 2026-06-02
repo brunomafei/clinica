@@ -2,11 +2,20 @@
 #   Cada procedimento deve conter: descrição, custo, e profissional responsável.
 from model.pessoa import Profissional
 
-class Procedimento:
-    def __init__(self, descricao: str, custo: float, profissional_responsavel: Profissional):
+class Procedimento:    
+    def __init__(self, descricao: str, custo: float, profissional_responsavel: Profissional, id_procedimento: int):
         self.__descricao = descricao
         self.__custo = custo
         self.__profissional_responsavel = profissional_responsavel
+        self.__id_procedimento = id_procedimento
+
+    @property
+    def id_procedimento(self):
+        return self.__id_procedimento
+    
+    @id_procedimento.setter
+    def id_procedimento(self, id_procedimento):
+        self.__id_procedimento = id_procedimento
 
     @property
     def descricao(self):
