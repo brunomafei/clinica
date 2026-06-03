@@ -11,20 +11,22 @@ class ControladorRelatorio:
 # Clínicas com maior número de atendimentos-------------------------------------------------------------------------------------------
 
     def relatorio_clinicas_mais_atendimentos(self):
+            todas_clinicas = self.__controlador_clinica.listar_clinicas()
             atendimentos = self.__controlador_atendimento.listar_atendimentos()
 
             # Verifica se a lista está vazia
-            if not atendimentos:
-                raise ElementoNaoEncontradoException("Nenhum atendimento encontrado para gerar o relatório.")
-            
+            if not todas_clinicas:
+                raise ElementoNaoEncontradoException("Nenhuma clínica encontrada para gerar o relatório.")
+
             # Percorre todos os atendimentos e conta quantas vezes cada clínica aparece
             contagem_de_clinicas = {}
+            for clinica in todas_clinicas:
+                contagem_de_clinicas[clinica.nome] = 0  # Inicializa a contagem para cada clínica
+
             for atendimento in atendimentos:
-                clinica = atendimento.clinica
+                clinica = atendimento.clinica.nome
                 if clinica in contagem_de_clinicas:
                     contagem_de_clinicas[clinica] += 1
-                else:
-                    contagem_de_clinicas[clinica] = 1
 
             ordena_clinicas = sorted(contagem_de_clinicas.items(), key=lambda x: x[1], reverse=True)
             return ordena_clinicas
