@@ -14,6 +14,8 @@ class ControladorPrincipal:
         self.controlador_procedimento = ControladorProcedimento()
         self.controlador_relatorio = ControladorRelatorio(self.controlador_atendimento, self.controlador_pagamento)
 
+# Getters ---------------------------------------------------------------------------------------------------------
+
     @property
     def controlador_pessoa(self):
         return self.controlador_pessoa
@@ -37,9 +39,11 @@ class ControladorPrincipal:
     @property
     def controlador_relatorio(self):
         return self.controlador_relatorio
-    
+
+# Inicialização do sistema ---------------------------------------------------------------------------------------------------------
+
     def inicializar_sistema(self):
-        while true:
+        while True:
             opcao = self.__tela_principal.tela_opcoes()
 
             if opcao == '0':

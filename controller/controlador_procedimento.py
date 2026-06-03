@@ -9,8 +9,10 @@ class ControladorProcedimento:
 
 # CADASTRO --------------------------------------------------------------------------------------
 
-    def incluir_procedimento(self, descricao, custo, profissional_responsavel):
-        novo_procedimento = Procedimento(descricao, custo, profissional_responsavel)
+    def incluir_procedimento(self, descricao, custo, profissional_responsavel, id_procedimento):
+        novo_procedimento = Procedimento(descricao, custo, profissional_responsavel, id_procedimento)
+        if id_procedimento in self.__procedimentos:
+            raise ElementoRepetidoException("Já existe um procedimento com esse ID.")
         self.__procedimentos.append(novo_procedimento)
         return novo_procedimento
 
@@ -20,7 +22,7 @@ class ControladorProcedimento:
         for procedimento in self.__procedimentos:
             if procedimento.id_procedimento == id_procedimento: 
                 return procedimento
-        return None
+        raise ElementoNaoExisteException("Procedimento não encontrado.")
     
 # LISTAGEM ------------------------------------------------------------------------------------------------------------------
 
@@ -41,8 +43,10 @@ class ControladorProcedimento:
     
 # REMOÇÃO ------------------------------------------------------------------------------------------------------------------
 
-    def excluir_procedimento(self, procedimento):
-        if procedimento in self.__procedimentos:
+    def excluir_procedimento(self, id_procedimento):
+        try:
+            procedimento = self.buscar_procedimento_por_id(id_procedimento)
             self.__procedimentos.remove(procedimento)
             return True
-        return False
+        except ElementoNaoExisteException:
+            return False
