@@ -13,29 +13,36 @@ class ControladorPessoa:
 
 # CADASTRO --------------------------------------------------------------------------------------
     # Cadastra Paciente
-    def cadastrar_paciente(self, nome, idade, celular, cpf):
-        if self.buscar_pessoa_por_cpf(cpf) is not None:
-            raise ElementoRepetidoException("Já existe uma pessoa cadastrada com esse CPF.")
-        
-        # Cria um PACIENTE e adiciona na lista
-        paciente = Paciente(nome, celular, cpf, idade)
-        self.__pessoas.append(paciente)
-        return paciente
+    def cadastrar_paciente(self):
+        nome, idade, celular, cpf = self.__tela_pessoa.pega_dados_paciente()
+        try:
+            if self.buscar_pessoa_por_cpf(cpf) is not None:
+                raise ElementoRepetidoException("Já existe uma pessoa cadastrada com esse CPF.")
+            paciente = Paciente(nome, celular, cpf, idade)
+            self.__pessoas.append(paciente)
+            self.__tela_pessoa.mostra_mensagem("Paciente cadastrado com sucesso.")
+        except ElementoRepetidoException:
+            self.__tela_pessoa.mostra_mensagem("Erro: Este elemento já existe. Tente novamente.")
 
     # Cadastra Profissional
-    def cadastrar_profissional(self, nome, celular, cpf, especialidade, registro):
-        if self.buscar_pessoa_por_cpf(cpf) is not None:
-            raise ElementoRepetidoException("Já existe uma pessoa cadastrada com esse CPF.")
-        
-        # Cria um PROFISSIONAL e adiciona na lista
-        profissional = Profissional(nome, celular, cpf, especialidade, registro)
-        self.__pessoas.append(profissional)
-        return profissional
+    def cadastrar_profissional(self):
+        nome, celular, cpf, especialidade, registro = self.__tela_pessoa.pega_dados_profissional()
+        try:
+            if self.buscar_pessoa_por_cpf(cpf) is not None:
+                raise ElementoRepetidoException("Já existe uma pessoa cadastrada com esse CPF.")
+            profissional = Profissional(nome, celular, cpf, especialidade, registro)
+            self.__pessoas.append(profissional)
+            self.__tela_pessoa.mostra_mensagem("Profissional cadastrado com sucesso.")
+        except ElementoRepetidoException:
+            self.__tela_pessoa.mostra_mensagem("Erro: Este elemento já existe. Tente novamente.")
 
 # LISTAGEM ------------------------------------------------------------------------------------------------------------------
 
     def listar_pessoas(self):
-        return self.__pessoas
+        if not self.__pessoas:
+            self.__tela_pessoa.mostra_mensagem("Nenhuma pessoa cadastrada.")
+            return
+        self.__tela_pessoa.mostra_pessoas(self.__pessoas)
 
 # BUSCA --------------------------------------------------------------------------------------------------------------------- 
 
@@ -46,63 +53,85 @@ class ControladorPessoa:
                 return pessoa
         return None
     
-# ATUALIZAÇÃO ------------------------------------------------------------------------------------------------------------------   
-#  
-    def alterar_pessoa(self, pessoa, novo_nome, novo_celular, novo_cpf, nova_idade=None, nova_especialidade=None, novo_registro=None):
-        #identifica se a pessoa existe na lista de pessoas, caso contrário lança uma exceção
-        if pessoa not in self.__pessoas:
-            raise ElementoNaoExisteException("Pessoa não encontrada no sistema.")
+# ALTERAÇÃO ------------------------------------------------------------------------------------------------------------------   
 
-        # identifica se o cpf e diferente do atual e se já existe outra pessoa com o novo cpf
-        if pessoa.cpf != novo_cpf and self.buscar_pessoa_por_cpf(novo_cpf) is not None:
-            raise ElementoRepetidoException("O novo CPF informado já pertence a outra pessoa.")
+    def alterar_pessoa(self):
+        cpf = self.__tela_pessoa.seleciona_cpf()
+        pessoa = self.buscar_pessoa_por_cpf(cpf)
         
-        # Atualiza os dados comuns
-        pessoa.nome = novo_nome
-        pessoa.celular = novo_celular
-        pessoa.cpf = novo_cpf
-
-        # Atualiza os dados específicos com base no tipo da pessoa
-        if isinstance(pessoa, Paciente):
-            if nova_idade is not None:
-                pessoa.idade = nova_idade
+        if pessoa is not None:
+            novo_nome = input("Novo nome: ")
+            novo_celular = input("Novo celular: ")
+            novo_cpf = input("Novo CPF: ")
+            
+            try:
+                if pessoa.cpf != novo_cpf and self.buscar_pessoa_por_cpf(novo_cpf) is not None:
+                    raise ElementoRepetidoException("O novo CPF informado já pertence a outra pessoa.")
                 
-        elif isinstance(pessoa, Profissional):
-            if nova_especialidade is not None:
-                pessoa.especialidade = nova_especialidade
-            if novo_registro is not None:
-                pessoa.registro = novo_registro
+                pessoa.nome = novo_nome
+                pessoa.celular = novo_celular
+                pessoa.cpf = novo_cpf
                 
-        return pessoa
+                if isinstance(pessoa, Paciente):
+                    while True:
+                        try:
+                            nova_idade = int(input("Nova idade: "))
+                            break
+                        except ValueError:
+                            print(" Digite um número válido!")
+                            # loop para um int
+                    nova_idade = int(input("Nova idade: "))
+                    pessoa.idade = nova_idade
+                    
+                elif isinstance(pessoa, Profissional):
+                    nova_especialidade = input("Nova especialidade: ")
+                    novo_registro = input("Novo registro: ")
+                    pessoa.especialidade = nova_especialidade
+                    pessoa.registro = novo_registro
+                
+                self.__tela_pessoa.mostra_mensagem("Pessoa alterada com sucesso.")
+            except ElementoRepetidoException:
+                self.__tela_pessoa.mostra_mensagem("Erro: Este elemento já existe. Tente novamente.")
+        else:
+            self.__tela_pessoa.mostra_mensagem("Pessoa não encontrada.")
 
 # REMOÇÃO ------------------------------------------------------------------------------------------------------------------
-    def remover_pessoa(self, pessoa):
-        if pessoa in self.__pessoas:
+    def remover_pessoa(self):
+        cpf = self.__tela_pessoa.seleciona_cpf()
+        pessoa = self.buscar_pessoa_por_cpf(cpf)
+        
+        if pessoa is not None:
             self.__pessoas.remove(pessoa)
-            return True
-        return False
+            self.__tela_pessoa.mostra_mensagem("Pessoa removida com sucesso.")
+        else:
+            self.__tela_pessoa.mostra_mensagem("Pessoa não encontrada.")
 
 # TELA ------------------------------------------------------------------------------------------------------------------
     def retornar(self):
         return
 
     def abre_tela(self):
-        opcoes = {
-            1: self.cadastrar_paciente, 
-            2: self.cadastrar_profissional, 
-            3: self.alterar_pessoa, 
-            4: self.listar_pessoas, 
-            5: self.remover_pessoa, 
+        lista_opcoes = {
+            1: self.cadastrar_paciente,
+            2: self.cadastrar_profissional,
+            3: self.alterar_pessoa,
+            4: self.listar_pessoas,
+            5: self.remover_pessoa,
             0: self.retornar
         }
-        while True:
+
+        continua = True
+
+        while continua:
             opcao = self.__tela_pessoa.tela_opcoes()
-            funcao = opcoes.get(opcao)
-            
-            if opcao == 0:
-                funcao() # type: ignore
-                break
-            elif funcao:
-                funcao()
+            funcao_escolhida = lista_opcoes.get(opcao)
+
+            if funcao_escolhida:
+                funcao_escolhida()
             else:
-                self.__tela_pessoa.mostra_mensagem("Opção inválida.")
+                self.__tela_pessoa.mostra_mensagem(" Opção inválida!")
+
+            if opcao == 0:
+                continua = False
+            
+            

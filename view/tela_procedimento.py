@@ -10,7 +10,7 @@ class TelaProcedimento:
         print("3. Alterar Procedimento")
         print("4. Excluir Procedimento")
         print("0. Voltar")
-        
+
         try:
             opcao = int(input("Escolha a opção: "))
         except ValueError:
@@ -38,7 +38,9 @@ class TelaProcedimento:
     def mostra_procedimentos(self, procedimentos):
         print("\n--- Lista de Procedimentos ---")
         for procedimento in procedimentos:
-            print(f"ID: {procedimento.id_procedimento} | Descrição: {procedimento.descricao} | Custo: {procedimento.custo} | Profissional Responsável: {procedimento.profissional_responsavel.nome}")
+            prof = procedimento.profissional_responsavel
+            nome_prof = getattr(prof, 'nome', prof)
+            print(f"ID: {procedimento.id_procedimento} | Descrição: {procedimento.descricao} | Custo: {procedimento.custo} | Profissional Responsável: {nome_prof}")
 
 # pega procedimento pelo id--------------------------------------------------------------------------------
     def seleciona_procedimento(self):

@@ -22,7 +22,13 @@ class TelaPessoa:
 # Método para pegar dados do paciente------------------------------------------
     def pega_dados_paciente(self):
         nome = input("Nome: ")
-        idade = int(input("Idade: "))
+        while True:
+            try:
+                idade = int(input("Idade: "))
+                break
+            except ValueError:
+                print(" Digite um número válido!")
+                # loop para um int 
         celular = input("Celular: ")
         cpf = input("CPF: ")
         return nome, idade, celular, cpf
