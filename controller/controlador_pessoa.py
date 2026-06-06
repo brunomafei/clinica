@@ -1,6 +1,7 @@
 
 from model.pessoa import Paciente    
 from model.pessoa import Profissional
+from view.tela_pessoa import TelaPessoa
 from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
 from exceptions.elemento_repetido_exception import ElementoRepetidoException
 
@@ -8,6 +9,7 @@ class ControladorPessoa:
     def __init__(self):
         # lista de pacientes e profissionais
         self.__pessoas = []
+        self.__tela_pessoa = TelaPessoa()
 
 # CADASTRO --------------------------------------------------------------------------------------
     # Cadastra Paciente
@@ -16,7 +18,7 @@ class ControladorPessoa:
             raise ElementoRepetidoException("Já existe uma pessoa cadastrada com esse CPF.")
         
         # Cria um PACIENTE e adiciona na lista
-        paciente = Paciente(nome, idade, celular, cpf)
+        paciente = Paciente(nome, celular, cpf, idade)
         self.__pessoas.append(paciente)
         return paciente
 

@@ -11,7 +11,12 @@ class TelaProcedimento:
         print("4. Excluir Procedimento")
         print("0. Voltar")
         
-        return input("Escolha uma opção: ")
+        try:
+            opcao = int(input("Escolha a opção: "))
+        except ValueError:
+            print(" Digite um número válido!")
+            opcao = -1
+        return opcao
 
 # Métodos para interagir com o usuário ----------------------------------------------------------------------
 
@@ -21,7 +26,10 @@ class TelaProcedimento:
         descricao = input("Descrição do procedimento: ")
         custo = float(input("Custo do procedimento: "))
         profissional_responsavel = input("Profissional responsável: ")
-        id_procedimento = input("ID do procedimento: ")
+        try:
+            id_procedimento = int(input("ID do procedimento: "))
+        except ValueError:
+            id_procedimento = input("ID do procedimento: ")
 
         return {"descricao": descricao, "custo": custo, "profissional_responsavel": profissional_responsavel, "id_procedimento": id_procedimento}
 
@@ -34,10 +42,13 @@ class TelaProcedimento:
 
 # pega procedimento pelo id--------------------------------------------------------------------------------
     def seleciona_procedimento(self):
-        id_procedimento = input("Digite o ID do procedimento: ")
+        try:
+            id_procedimento = int(input("Digite o ID do procedimento: "))
+        except ValueError:
+            id_procedimento = input("Digite o ID do procedimento: ")
         return id_procedimento
 
 # mostra mensagem-----------------------------------------------------------------------------------------
-   
+
     def mostra_mensagem(self, mensagem):
         print(mensagem)
