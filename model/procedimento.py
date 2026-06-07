@@ -9,6 +9,7 @@ class Procedimento:
         self.__profissional_responsavel = profissional_responsavel
         self.__id_procedimento = id_procedimento
 
+# property e setters--------------------------------------------------------------------------------------
     @property
     def id_procedimento(self):
         return self.__id_procedimento

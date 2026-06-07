@@ -6,7 +6,7 @@ class Pessoa(ABC):
         self.__celular = celular
         self.__cpf = cpf
 
- #property e setters--------------------------------------------------------------------------------------
+# property e setters--------------------------------------------------------------------------------------
 
     @property
     def nome(self):
@@ -32,7 +32,7 @@ class Pessoa(ABC):
     def cpf(self, cpf):
         self.__cpf = cpf
 
-#-----------------------------------------------------------------------------------------------------------
+# Paciente -----------------------------------------------------------------------------------------------------------
 
 class Paciente(Pessoa):
     def __init__(self, nome: str, celular: str, cpf: str, idade: int):
@@ -54,7 +54,7 @@ class Paciente(Pessoa):
 
 
 
-#------------------------------------------------------------------------------------------------------------
+# Profissional ------------------------------------------------------------------------------------------------------------
 
 class Profissional(Pessoa):
     def __init__(self, nome: str, celular: str, cpf: str, especialidade: str, registro: str):

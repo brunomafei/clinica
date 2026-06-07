@@ -35,8 +35,9 @@ class ControladorProcedimento:
     def listar_procedimentos(self):
         if not self.__procedimentos:
             self.__tela_procedimento.mostra_mensagem("Nenhum procedimento cadastrado.")
-            return
+            return []
         self.__tela_procedimento.mostra_procedimentos(self.__procedimentos)
+        return self.__procedimentos
     
 # ALTERAÇÃO ------------------------------------------------------------------------------------------------------------------
 
