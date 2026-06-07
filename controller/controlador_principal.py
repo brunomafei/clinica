@@ -6,12 +6,15 @@ from controller.controlador_procedimento import ControladorProcedimento
 from controller.controlador_relatorio import ControladorRelatorio
 from view.tela_principal import TelaPrincipal
 
+
 class ControladorPrincipal:
     def __init__(self):
         self.__controlador_pessoa = ControladorPessoa()
         self.__controlador_clinica = ControladorClinica()
-        self.__controlador_atendimento = ControladorAtendimento(self.__controlador_pessoa, self.__controlador_clinica)
-        self.__controlador_pagamento = ControladorPagamento()
+        self.__controlador_atendimento = ControladorAtendimento(
+            self.__controlador_pessoa, self.__controlador_clinica)
+        self.__controlador_pagamento = ControladorPagamento(
+            self.__controlador_atendimento)
         self.__controlador_procedimento = ControladorProcedimento()
         self.__controlador_relatorio = ControladorRelatorio(
             self.__controlador_clinica,
@@ -19,8 +22,6 @@ class ControladorPrincipal:
             self.__controlador_atendimento
         )
         self.__tela_principal = TelaPrincipal()
-
-# Getters ---------------------------------------------------------------------------------------------------------
 
     @property
     def controlador_pessoa(self):
@@ -46,8 +47,6 @@ class ControladorPrincipal:
     def controlador_relatorio(self):
         return self.__controlador_relatorio
 
-# Inicialização do sistema ---------------------------------------------------------------------------------------------------------
-
     def inicializa_sistema(self):
         while True:
             opcao = self.__tela_principal.tela_opcoes()
@@ -67,4 +66,5 @@ class ControladorPrincipal:
             elif opcao == 6:
                 self.__controlador_relatorio.abre_tela()
             else:
-                self.__tela_principal.mostra_mensagem("Opção inválida. Tente novamente.")
+                self.__tela_principal.mostra_mensagem(
+                    "Opção inválida. Tente novamente.")

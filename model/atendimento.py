@@ -1,19 +1,17 @@
 from datetime import date, time
-from model.pessoa import Paciente
-from model.pessoa import Profissional
-from model.clinica import Clinica
+
 
 class Atendimento:
 
     def __init__(self,
-                clinica,
-                paciente,
-                profissional,
-                data: date,
-                horario_inicio: time,
-                horario_fim: time,
-                tipo_atendimento: str,
-                valor_total: float):  
+                 clinica,
+                 paciente,
+                 profissional,
+                 data: date,
+                 horario_inicio: time,
+                 horario_fim: time,
+                 tipo_atendimento: str,
+                 valor_total: float):
 
         if not clinica.horario_funcionamento(horario_inicio, horario_fim):
             raise ValueError("Atendimento fora do horário da clínica.")
@@ -25,7 +23,7 @@ class Atendimento:
         self.__horario_inicio = horario_inicio
         self.__horario_fim = horario_fim
         self.__tipo_atendimento = tipo_atendimento
-        self.__valor_total = valor_total 
+        self.__valor_total = valor_total
 
     @property
     def clinica(self):

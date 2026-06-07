@@ -1,8 +1,6 @@
 
 class TelaProcedimento:
 
-# Opçoes de tela----------------------------------------------------------------------
-
     def tela_opcoes(self):
         print("\n--- Procedimentos ---")
         print("1. Incluir Procedimento")
@@ -18,8 +16,6 @@ class TelaProcedimento:
             opcao = -1
         return opcao
 
-# Métodos para interagir com o usuário ----------------------------------------------------------------------
-
     def pega_dados_procedimento(self):
         print("\n--- Cadastro de Procedimento ---")
 
@@ -33,8 +29,6 @@ class TelaProcedimento:
 
         return {"descricao": descricao, "custo": custo, "profissional_responsavel": profissional_responsavel, "id_procedimento": id_procedimento}
 
-# Métodos para exibir informações ----------------------------------------------------------------------
-
     def mostra_procedimentos(self, procedimentos):
         print("\n--- Lista de Procedimentos ---")
         for procedimento in procedimentos:
@@ -42,15 +36,12 @@ class TelaProcedimento:
             nome_prof = getattr(prof, 'nome', prof)
             print(f"ID: {procedimento.id_procedimento} | Descrição: {procedimento.descricao} | Custo: {procedimento.custo} | Profissional Responsável: {nome_prof}")
 
-# pega procedimento pelo id--------------------------------------------------------------------------------
     def seleciona_procedimento(self):
         try:
             id_procedimento = int(input("Digite o ID do procedimento: "))
         except ValueError:
             id_procedimento = input("Digite o ID do procedimento: ")
         return id_procedimento
-
-# mostra mensagem-----------------------------------------------------------------------------------------
 
     def mostra_mensagem(self, mensagem):
         print(mensagem)

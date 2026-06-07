@@ -1,58 +1,68 @@
-from controlador_pagamento import Pagamento_pix, Pagamento_cartao, Pagamento_cedula
+from model.pagamento import Pagamento_pix, Pagamento_cartao, Pagamento_cedula
+from view.tela_pagamento import Tela_Pagamento
+from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
 
 
 class ControladorPagamento:
-    def __init__(self):
-        # Aqui guardamos todos os recibos (pagamentos) do sistema inteiro
+    def __init__(self, controlador_atendimento):
         self.__pagamentos = []
+        self.__tela_pagamento = Tela_Pagamento()
+        self.__controlador_atendimento = controlador_atendimento
 
-    def incluir_pagamento(self, atendimento, tipo, data, valor, **kwargs):
-        try:
-            novo_pagamento = None
+    def abre_tela(self):
+        lista_opcoes = {
+            1: self.incluir_pagamento,
+            2: self.listar_pagamentos
+        }
 
-            # Decide qual "filho" de Pagamento criar com base no tipo escolhido na tela
-            if tipo.upper() == "PIX":
-                chave = kwargs.get("chave_pix")
-                novo_pagamento = Pagamento_pix(data, valor, chave, atendimento)
+        while True:
+            opcao = self.__tela_pagamento.tela_opcoes()
+            if opcao == 0:
+                break
 
-            elif tipo.upper() == "CARTAO":
-                numero = kwargs.get("numero_cartao")
-                bandeira = kwargs.get("bandeira")
-                novo_pagamento = Pagamento_cartao(
-                    data, valor, numero, bandeira, atendimento)
-
-            elif tipo.upper() == "CEDULA":
-                novo_pagamento = Pagamento_cedula(data, valor, atendimento)
-
+            funcao = lista_opcoes.get(opcao)
+            if funcao:
+                funcao()
             else:
-                # Se digitar um tipo maluco que não existe...
-                raise ValueError(
-                    "Tipo de pagamento inválido! Escolha PIX, Cartão ou Cédula.")
+                self.__tela_pagamento.mostra_mensagem("Opção inválida!")
 
-            self.__pagamentos.append(novo_pagamento)
-            return novo_pagamento
+    def incluir_pagamento(self):
+        dados = self.__tela_pagamento.pega_dados_pagamento()
 
-        except ValueError as e:
-            # Pega erros como "data do pagamento maior que a consulta" que fizemos no Model
-            print(f"Erro ao processar pagamento: {e}")
-            return None
+        if dados is not None:
+            try:
+                atendimento = self.__controlador_atendimento.buscar_atendimento_por_id(
+                    dados["id_atendimento"])
+
+                if atendimento is None:
+                    raise ElementoNaoExisteException(
+                        "Atendimento não encontrado.")
+
+                novo_pagamento = None
+                tipo = dados["tipo"]
+
+                if tipo == "PIX":
+                    novo_pagamento = Pagamento_pix(
+                        dados["data"], dados["valor"], dados["chave_pix"], atendimento)
+                elif tipo == "CARTAO":
+                    novo_pagamento = Pagamento_cartao(
+                        dados["data"], dados["valor"], dados["numero_cartao"], dados["bandeira"], atendimento)
+                elif tipo == "CEDULA":
+                    novo_pagamento = Pagamento_cedula(
+                        dados["data"], dados["valor"], atendimento)
+                else:
+                    raise ValueError("Tipo inválido.")
+
+                self.__pagamentos.append(novo_pagamento)
+                atendimento.valor_total -= dados["valor"]
+                self.__tela_pagamento.mostra_mensagem(
+                    f"Pago! Valor restante: R${atendimento.valor_total:.2f}")
+
+            except Exception as e:
+                self.__tela_pagamento.mostra_mensagem(f"Erro: {e}")
 
     def listar_pagamentos(self):
-        return self.__pagamentos
-
-    def alterar_pagamento(self, pagamento, nova_data, novo_valor):
-        try:
-            # Na vida real a gente não costuma alterar recibo, mas como o CRUD
-            # exige alteração para os Registros, a gente implementa!
-            pagamento.data = nova_data
-            pagamento.valor_pago = novo_valor
-            return True
-        except ValueError as e:
-            print(f"Erro ao alterar o pagamento: {e}")
-            return False
-
-    def excluir_pagamento(self, pagamento):
-        if pagamento in self.__pagamentos:
-            self.__pagamentos.remove(pagamento)
-            return True
-        return False
+        if len(self.__pagamentos) == 0:
+            self.__tela_pagamento.mostra_mensagem("Nenhum pagamento.")
+        else:
+            self.__tela_pagamento.mostra_pagamentos(self.__pagamentos)

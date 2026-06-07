@@ -1,7 +1,6 @@
 
 class TelaPrincipal:
 
-# Tela opções para o usuário escolher a ação desejada----------------------------
     def tela_opcoes(self):
         print("\n--- Menu Principal ---")
         print("1. Atendimentos")
@@ -19,6 +18,5 @@ class TelaPrincipal:
             opcao = -1
         return opcao
 
-# Método para mostrar mensagens para o usuário------------------------------------------------------
     def mostra_mensagem(self, mensagem):
         print(mensagem)

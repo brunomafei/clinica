@@ -1,8 +1,8 @@
 from model.pessoa import Paciente, Profissional
 
+
 class TelaPessoa:
 
-# Tela opções para o usuário escolher a ação desejada----------------------------
     def tela_opcoes(self):
         print("\n--- Pessoas ---")
         print("1 - Cadastrar paciente")
@@ -19,7 +19,6 @@ class TelaPessoa:
             opcao = -1
         return opcao
 
-# Método para pegar dados do paciente------------------------------------------
     def pega_dados_paciente(self):
         nome = input("Nome: ")
         while True:
@@ -28,12 +27,11 @@ class TelaPessoa:
                 break
             except ValueError:
                 print(" Digite um número válido!")
-                # loop para um int 
+                # loop para um int
         celular = input("Celular: ")
         cpf = input("CPF: ")
         return nome, idade, celular, cpf
 
-# Método para pegar dados do profissional----------------------------------------
     def pega_dados_profissional(self):
         nome = input("Nome: ")
         celular = input("Celular: ")
@@ -42,11 +40,9 @@ class TelaPessoa:
         registro = input("Registro profissional: ")
         return nome, celular, cpf, especialidade, registro
 
-# Método para selecionar pessoa por CPF------------------------------------------------------
     def seleciona_cpf(self):
         return input("CPF da pessoa: ")
 
-# Método para mostrar pessoas cadastradas------------------------------------------------------
     def mostra_pessoas(self, pessoas):
         if not pessoas:
             print("Nenhuma pessoa cadastrada.")
@@ -57,7 +53,6 @@ class TelaPessoa:
             self.mostra_pessoa(pessoa)
             print("-" * 30)
 
-# Método para mostrar detalhes de uma pessoa específica------------------------------------------------------
     def mostra_pessoa(self, pessoa):
         tipo = "Paciente" if isinstance(pessoa, Paciente) else "Profissional"
         print(f"Tipo: {tipo}")
@@ -71,6 +66,5 @@ class TelaPessoa:
             print(f"Especialidade: {pessoa.especialidade}")
             print(f"Registro: {pessoa.registro}")
 
-# Método para mostrar mensagens para o usuário------------------------------------------------------
     def mostra_mensagem(self, msg):
         print(msg)

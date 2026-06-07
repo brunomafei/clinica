@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import date
 
-# Superclasse Abstrata
-
 
 class Pagamento(ABC):
     def __init__(self, data: date, valor_pago: float, atendimento=None):
@@ -42,7 +40,6 @@ class Pagamento(ABC):
         pass
 
 
-# Subclasse: Pagamento via PIX
 class Pagamento_pix(Pagamento):
     def __init__(self, data: date, valor_pago: float, chave_pix: str, atendimento=None):
         super().__init__(data, valor_pago, atendimento)
@@ -60,7 +57,6 @@ class Pagamento_pix(Pagamento):
         return f"Pagamento PIX - Chave: {self.__chave_pix}"
 
 
-# Subclasse: Pagamento via Cartão
 class Pagamento_cartao(Pagamento):
     def __init__(self, data: date, valor_pago: float, numero_cartao: str, bandeira: str, atendimento=None):
         super().__init__(data, valor_pago, atendimento)
@@ -79,7 +75,6 @@ class Pagamento_cartao(Pagamento):
         return f"Pagamento Cartão - Bandeira: {self.__bandeira}"
 
 
-# Subclasse: Pagamento via Cédula (Dinheiro)
 class Pagamento_cedula(Pagamento):
     def __init__(self, data: date, valor_pago: float, atendimento=None):
         super().__init__(data, valor_pago, atendimento)
