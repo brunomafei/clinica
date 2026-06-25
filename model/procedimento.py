@@ -8,6 +8,7 @@ class Procedimento:
         self.__profissional_responsavel = profissional_responsavel
         self.__id_procedimento = id_procedimento
 
+# getters e setters para os atributos do procedimento---------------------------------------------------------------------
     @property
     def id_procedimento(self):
         return self.__id_procedimento

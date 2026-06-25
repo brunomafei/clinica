@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 
-
+# Classe abstrata para representar uma pessoa, com atributos comuns a pacientes e profissionais.
 class Pessoa(ABC):
     def __init__(self, nome: str, celular: str, cpf: str):
         self.__nome = nome
         self.__celular = celular
         self.__cpf = cpf
 
+# getters e setters para nome, celular e cpf----------------------------------------------------------------------------
     @property
     def nome(self):
         return self.__nome
@@ -31,7 +32,7 @@ class Pessoa(ABC):
     def cpf(self, cpf):
         self.__cpf = cpf
 
-
+# classe filha para paciente------------------------------------------------------------------------------------------
 class Paciente(Pessoa):
     def __init__(self, nome: str, celular: str, cpf: str, idade: int):
         super().__init__(nome, celular, cpf)
@@ -48,7 +49,7 @@ class Paciente(Pessoa):
     def eh_maior_de_idade(self):
         return self.__idade >= 18
 
-
+# classe filha para profissional------------------------------------------------------------------------------------------
 class Profissional(Pessoa):
     def __init__(self, nome: str, celular: str, cpf: str, especialidade: str, registro: str):
         super().__init__(nome, celular, cpf)

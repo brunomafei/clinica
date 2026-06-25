@@ -9,6 +9,7 @@ class ControladorProcedimento:
         self.__procedimentos = []
         self.__tela_procedimento = TelaProcedimento()
 
+# Inclusão de um novo procedimento, verificando se já existe um procedimento com o mesmo ID para evitar duplicidade---------------------------------------------------------------------------------------
     def incluir_procedimento(self):
         dados = self.__tela_procedimento.pega_dados_procedimento()
         try:
@@ -24,12 +25,14 @@ class ControladorProcedimento:
             self.__tela_procedimento.mostra_mensagem(
                 "Erro: Este elemento já existe. Tente novamente.")
 
+# Busca um procedimento pelo ID, lançando uma exceção caso o procedimento não seja encontrado---------------------------------------------------------------------------------------
     def buscar_procedimento_por_id(self, id_procedimento):
         for procedimento in self.__procedimentos:
             if procedimento.id_procedimento == id_procedimento:
                 return procedimento
         raise ElementoNaoExisteException("Procedimento não encontrado.")
 
+# Lista todos os procedimentos cadastrados, mostrando uma mensagem caso não haja procedimentos para listar---------------------------------------------------------------------------------------
     def listar_procedimentos(self):
         if not self.__procedimentos:
             self.__tela_procedimento.mostra_mensagem(
@@ -38,6 +41,7 @@ class ControladorProcedimento:
         self.__tela_procedimento.mostra_procedimentos(self.__procedimentos)
         return self.__procedimentos
 
+# Altera os dados de um procedimento existente, verificando se o procedimento existe antes de tentar alterá-lo---------------------------------------------------------------------------------------
     def alterar_procedimento(self):
         id_sel = self.__tela_procedimento.seleciona_procedimento()
         try:
@@ -52,6 +56,7 @@ class ControladorProcedimento:
             self.__tela_procedimento.mostra_mensagem(
                 "Erro: Elemento não encontrado.")
 
+# Exclui um procedimento existente, verificando se o procedimento existe antes de tentar excluí-lo---------------------------------------------------------------------------------------
     def excluir_procedimento(self):
         id_sel = self.__tela_procedimento.seleciona_procedimento()
         try:

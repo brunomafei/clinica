@@ -10,6 +10,7 @@ class ControladorPessoa:
         self.__pessoas = []
         self.__tela_pessoa = TelaPessoa()
 
+# metodo para cadastrar um paciente, verificando se já existe um paciente com o mesmo CPF para evitar duplicidade---------------------------------------------------------------------------------------
     def cadastrar_paciente(self):
         nome, idade, celular, cpf = self.__tela_pessoa.pega_dados_paciente()
         try:
@@ -24,6 +25,7 @@ class ControladorPessoa:
             self.__tela_pessoa.mostra_mensagem(
                 "Erro: Este elemento já existe. Tente novamente.")
 
+# metodo para cadastrar um profissional, verificando se já existe um profissional com o mesmo CPF para evitar duplicidade---------------------------------------------------------------------------------------
     def cadastrar_profissional(self):
         nome, celular, cpf, especialidade, registro = self.__tela_pessoa.pega_dados_profissional()
         try:
@@ -39,12 +41,14 @@ class ControladorPessoa:
             self.__tela_pessoa.mostra_mensagem(
                 "Erro: Este elemento já existe. Tente novamente.")
 
+# metodo para listar todas as pessoas cadastradas, mostrando uma mensagem caso não haja pessoas para listar---------------------------------------------------------------------------------------
     def listar_pessoas(self):
         if not self.__pessoas:
             self.__tela_pessoa.mostra_mensagem("Nenhuma pessoa cadastrada.")
             return
         self.__tela_pessoa.mostra_pessoas(self.__pessoas)
 
+# método para buscar uma pessoa pelo CPF, retornando None caso a pessoa não seja encontrada---------------------------------------------------------------------------------------
     def buscar_pessoa_por_cpf(self, cpf):
         for pessoa in self.__pessoas:
 
@@ -52,18 +56,21 @@ class ControladorPessoa:
                 return pessoa
         return None
 
+# método para buscar um paciente pelo CPF, retornando None caso o paciente não seja encontrado ou caso a pessoa encontrada não seja um paciente---------------------------------------------------------------------------------------
     def buscar_paciente_por_cpf(self, cpf):
         pessoa = self.buscar_pessoa_por_cpf(cpf)
         if isinstance(pessoa, Paciente):
             return pessoa
         return None
 
+# método para buscar um profissional pelo registro, retornando None caso o profissional não seja encontrado ou caso a pessoa encontrada não seja um profissional---------------------------------------------------------------------------------------
     def buscar_profissional_por_registro(self, registro):
         for pessoa in self.__pessoas:
             if isinstance(pessoa, Profissional) and pessoa.registro == registro:
                 return pessoa
         return None
 
+# método para alterar os dados de uma pessoa existente, verificando se a pessoa existe antes de tentar alterá-la e verificando se o novo CPF já pertence a outra pessoa para evitar duplicidade---------------------------------------------------------------------------------------
     def alterar_pessoa(self):
         cpf = self.__tela_pessoa.seleciona_cpf()
         pessoa = self.buscar_pessoa_por_cpf(cpf)

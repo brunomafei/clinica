@@ -3,6 +3,7 @@ from model.pessoa import Paciente, Profissional
 
 class TelaPessoa:
 
+# método para mostrar as opções do menu de pessoas, tratando a exceção caso o usuário digite um valor inválido---------------------------------------
     def tela_opcoes(self):
         print("\n--- Pessoas ---")
         print("1 - Cadastrar paciente")
@@ -19,6 +20,7 @@ class TelaPessoa:
             opcao = -1
         return opcao
 
+# métodos para pegar os dados dos pacientes e profissionais, tratando a exceção caso o usuário digite um valor inválido para a idade do paciente---------------------------------------
     def pega_dados_paciente(self):
         nome = input("Nome: ")
         while True:
@@ -32,6 +34,7 @@ class TelaPessoa:
         cpf = input("CPF: ")
         return nome, idade, celular, cpf
 
+# método para pegar os dados dos profissionais, tratando a exceção caso o usuário digite um valor inválido para o registro do profissional---------------------------------------
     def pega_dados_profissional(self):
         nome = input("Nome: ")
         celular = input("Celular: ")
@@ -40,9 +43,11 @@ class TelaPessoa:
         registro = input("Registro profissional: ")
         return nome, celular, cpf, especialidade, registro
 
+# método para selecionar o CPF de uma pessoa, para ser usado na alteração e remoção de pessoas---------------------------------------------------------------------------------------
     def seleciona_cpf(self):
         return input("CPF da pessoa: ")
 
+# método para mostrar a lista de pessoas, mostrando uma mensagem caso não haja pessoas cadastradas---------------------------------------------------------------------------------------
     def mostra_pessoas(self, pessoas):
         if not pessoas:
             print("Nenhuma pessoa cadastrada.")
@@ -53,6 +58,7 @@ class TelaPessoa:
             self.mostra_pessoa(pessoa)
             print("-" * 30)
 
+# método para mostrar os dados de uma pessoa, identificando se é um paciente ou profissional e mostrando as informações correspondentes---------------------------------------------------------------------------------------
     def mostra_pessoa(self, pessoa):
         tipo = "Paciente" if isinstance(pessoa, Paciente) else "Profissional"
         print(f"Tipo: {tipo}")
