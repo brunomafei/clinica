@@ -2,11 +2,12 @@ from model.clinica import Clinica
 from view.tela_clinica import Tela_Clinica
 from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
 from exceptions.elemento_repetido_exception import ElementoRepetidoException
+from daos.clinica_dao import ClinicaDAO
 
 
 class ControladorClinica:
     def __init__(self):
-        self.__clinicas = []
+        self.__clinicas_dao = ClinicaDAO()
         self.__tela_clinica = Tela_Clinica()
 
     def abre_tela(self):
@@ -41,7 +42,7 @@ class ControladorClinica:
                     dados["nome"], dados["cidade"], dados["descricao"],
                     dados["horario_abertura"], dados["horario_fechamento"]
                 )
-                self.__clinicas.append(nova_clinica)
+                self.__clinicas_dao.add(nova_clinica)
                 self.__tela_clinica.mostra_mensagem(
                     "Clínica cadastrada com sucesso!")
             except Exception as e:
@@ -66,6 +67,7 @@ class ControladorClinica:
                     clinica.descricao = novos_dados["descricao"]
                     clinica.horario_abertura = novos_dados["horario_abertura"]
                     clinica.horario_fechamento = novos_dados["horario_fechamento"]
+                    self.__clinicas_dao.add(clinica)
 
                     self.__tela_clinica.mostra_mensagem(
                         "Clínica alterada com sucesso!")
@@ -83,20 +85,19 @@ class ControladorClinica:
                     raise ElementoNaoExisteException(
                         f"Não encontramos nenhuma clínica com o nome '{nome_clinica}'.")
 
-                self.__clinicas.remove(clinica)
+                self.__clinicas_dao.remove(nome_clinica)
                 self.__tela_clinica.mostra_mensagem(
                     "Clínica excluída com sucesso!")
             except Exception as e:
                 self.__tela_clinica.mostra_mensagem(str(e))
 
     def listar_clinicas(self):
-        if len(self.__clinicas) == 0:
+        clinicas = list(self.__clinicas_dao.get_all())
+        if len(clinicas) == 0:
             self.__tela_clinica.mostra_mensagem("Nenhuma clínica cadastrada.")
         else:
-            self.__tela_clinica.mostra_clinica(self.__clinicas)
+            self.__tela_clinica.mostra_clinica(clinicas)
 
     def buscar_clinica_por_nome(self, nome):
-        for clinica in self.__clinicas:
-            if clinica.nome == nome:
-                return clinica
-        return None
+        clinica = self.__clinicas_dao.get(nome)
+        return clinica

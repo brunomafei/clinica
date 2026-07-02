@@ -1,11 +1,12 @@
 from model.pagamento import Pagamento_pix, Pagamento_cartao, Pagamento_cedula
 from view.tela_pagamento import Tela_Pagamento
 from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
+from daos.pagamento_dao import PagamentoDAO
 
 
 class ControladorPagamento:
     def __init__(self, controlador_atendimento):
-        self.__pagamentos = []
+        self.__pagamentos_dao = PagamentoDAO()
         self.__tela_pagamento = Tela_Pagamento()
         self.__controlador_atendimento = controlador_atendimento
 
@@ -53,7 +54,7 @@ class ControladorPagamento:
                 else:
                     raise ValueError("Tipo inválido.")
 
-                self.__pagamentos.append(novo_pagamento)
+                self.__pagamentos_dao.add(novo_pagamento)
                 atendimento.valor_total -= dados["valor"]
                 self.__tela_pagamento.mostra_mensagem(
                     f"Pago! Valor restante: R${atendimento.valor_total:.2f}")
@@ -62,7 +63,8 @@ class ControladorPagamento:
                 self.__tela_pagamento.mostra_mensagem(f"Erro: {e}")
 
     def listar_pagamentos(self):
-        if len(self.__pagamentos) == 0:
+        pagamentos = list(self.__pagamentos_dao.get_all())
+        if len(pagamentos) == 0:
             self.__tela_pagamento.mostra_mensagem("Nenhum pagamento.")
         else:
-            self.__tela_pagamento.mostra_pagamentos(self.__pagamentos)
+            self.__tela_pagamento.mostra_pagamentos(pagamentos)

@@ -3,11 +3,12 @@ from model.pessoa import Paciente
 from model.pessoa import Profissional
 from view.tela_pessoa import TelaPessoa
 from exceptions.elemento_repetido_exception import ElementoRepetidoException
+from daos.pessoa_dao import PessoaDAO
 
 
 class ControladorPessoa:
     def __init__(self):
-        self.__pessoas = []
+        self.__pessoas_dao = PessoaDAO()
         self.__tela_pessoa = TelaPessoa()
 
 # metodo para cadastrar um paciente, verificando se já existe um paciente com o mesmo CPF para evitar duplicidade---------------------------------------------------------------------------------------
@@ -18,7 +19,7 @@ class ControladorPessoa:
                 raise ElementoRepetidoException(
                     "Já existe uma pessoa cadastrada com esse CPF.")
             paciente = Paciente(nome, celular, cpf, idade)
-            self.__pessoas.append(paciente)
+            self.__pessoas_dao.add(paciente)
             self.__tela_pessoa.mostra_mensagem(
                 "Paciente cadastrado com sucesso.")
         except ElementoRepetidoException:
@@ -34,7 +35,7 @@ class ControladorPessoa:
                     "Já existe uma pessoa cadastrada com esse CPF.")
             profissional = Profissional(
                 nome, celular, cpf, especialidade, registro)
-            self.__pessoas.append(profissional)
+            self.__pessoas_dao.add(profissional)
             self.__tela_pessoa.mostra_mensagem(
                 "Profissional cadastrado com sucesso.")
         except ElementoRepetidoException:
@@ -43,18 +44,16 @@ class ControladorPessoa:
 
 # metodo para listar todas as pessoas cadastradas, mostrando uma mensagem caso não haja pessoas para listar---------------------------------------------------------------------------------------
     def listar_pessoas(self):
-        if not self.__pessoas:
+        pessoas = list(self.__pessoas_dao.get_all())
+        if not pessoas:
             self.__tela_pessoa.mostra_mensagem("Nenhuma pessoa cadastrada.")
             return
-        self.__tela_pessoa.mostra_pessoas(self.__pessoas)
+        self.__tela_pessoa.mostra_pessoas(pessoas)
 
 # método para buscar uma pessoa pelo CPF, retornando None caso a pessoa não seja encontrada---------------------------------------------------------------------------------------
     def buscar_pessoa_por_cpf(self, cpf):
-        for pessoa in self.__pessoas:
-
-            if pessoa.cpf == cpf:
-                return pessoa
-        return None
+        pessoa = self.__pessoas_dao.get(cpf)
+        return pessoa
 
 # método para buscar um paciente pelo CPF, retornando None caso o paciente não seja encontrado ou caso a pessoa encontrada não seja um paciente---------------------------------------------------------------------------------------
     def buscar_paciente_por_cpf(self, cpf):
@@ -119,7 +118,7 @@ class ControladorPessoa:
         pessoa = self.buscar_pessoa_por_cpf(cpf)
 
         if pessoa is not None:
-            self.__pessoas.remove(pessoa)
+            self.__pessoas_dao.remove(cpf)
             self.__tela_pessoa.mostra_mensagem("Pessoa removida com sucesso.")
         else:
             self.__tela_pessoa.mostra_mensagem("Pessoa não encontrada.")
