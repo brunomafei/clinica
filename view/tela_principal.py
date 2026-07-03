@@ -1,22 +1,45 @@
+import FreeSimpleGUI as sg
+
 
 class TelaPrincipal:
+    # Tela principal da aplicação com interface gráfica simples.
+
+    def __init__(self):
+        # Define o tema visual da interface.
+        try:
+            sg.theme("DarkBlue3")
+        except Exception:
+            pass
 
     def tela_opcoes(self):
-        print("\n--- Menu Principal ---")
-        print("1. Atendimentos")
-        print("2. Clínicas")
-        print("3. Pagamentos")
-        print("4. Pessoas")
-        print("5. Procedimentos")
-        print("6. Relatórios")
-        print("0. Sair")
+        # Exibe as opções principais do sistema para o usuário.
+        # Cada botão representa uma área do sistema que pode ser acessada.
+        layout = [
+            [sg.Text("Clínica", font=("Helvetica", 20, "bold"))],
+            [sg.Text("Escolha uma opção:", font=("Helvetica", 12))],
+            [sg.Button("1. Atendimentos", key="1", size=(20, 1))],
+            [sg.Button("2. Clínicas", key="2", size=(20, 1))],
+            [sg.Button("3. Pagamentos", key="3", size=(20, 1))],
+            [sg.Button("4. Pessoas", key="4", size=(20, 1))],
+            [sg.Button("5. Procedimentos", key="5", size=(20, 1))],
+            [sg.Button("6. Relatórios", key="6", size=(20, 1))],
+            [sg.Button("0. Sair", key="0", size=(20, 1))],
+        ]
 
-        try:
-            opcao = int(input("Escolha a opção: "))
-        except ValueError:
-            print(" Digite um número válido!")
-            opcao = -1
-        return opcao
+        # Cria a janela e aguarda a escolha do usuário.
+        window = sg.Window("Menu Principal", layout, modal=True, finalize=True)
+        event, _ = window.read()
+        window.close()
+
+        # Se o usuário fechar a janela ou cancelar, retorna uma opção inválida.
+        if event in (None, ""):
+            return -1
+        return int(event)
 
     def mostra_mensagem(self, mensagem):
-        print(mensagem)
+        # Mostra uma mensagem ao usuário em uma janela popup.
+        # Isso é usado para feedback de sucesso, erro ou confirmação.
+        try:
+            sg.popup(mensagem, title="Mensagem")
+        except Exception:
+            print(mensagem)

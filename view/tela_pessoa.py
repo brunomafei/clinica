@@ -1,76 +1,146 @@
+import FreeSimpleGUI as sg
 from model.pessoa import Paciente, Profissional
 
 
 class TelaPessoa:
+    # Tela para cadastro, alteração e consulta de pessoas.
 
-# método para mostrar as opções do menu de pessoas, tratando a exceção caso o usuário digite um valor inválido---------------------------------------
-    def tela_opcoes(self):
-        print("\n--- Pessoas ---")
-        print("1 - Cadastrar paciente")
-        print("2 - Cadastrar profissional")
-        print("3 - Alterar pessoa")
-        print("4 - Listar pessoas")
-        print("5 - Remover pessoa")
-        print("0 - Voltar")
-
+    def __init__(self):
+        # Define o tema visual da interface.
         try:
-            opcao = int(input("Escolha a opção: "))
-        except ValueError:
-            print(" Digite um número válido!")
-            opcao = -1
-        return opcao
+            sg.theme("DarkBlue3")
+        except Exception:
+            pass
 
-# métodos para pegar os dados dos pacientes e profissionais, tratando a exceção caso o usuário digite um valor inválido para a idade do paciente---------------------------------------
+    def tela_opcoes(self):
+        # Exibe as opções de gerenciamento de pessoas.
+        # Esse menu direciona o fluxo para cadastro, alteração, listagem ou remoção.
+        layout = [
+            [sg.Text("Pessoas", font=("Helvetica", 18, "bold"))],
+            [sg.Button("1 - Cadastrar paciente", key="1", size=(24, 1))],
+            [sg.Button("2 - Cadastrar profissional", key="2", size=(24, 1))],
+            [sg.Button("3 - Alterar pessoa", key="3", size=(24, 1))],
+            [sg.Button("4 - Listar pessoas", key="4", size=(24, 1))],
+            [sg.Button("5 - Remover pessoa", key="5", size=(24, 1))],
+            [sg.Button("0 - Voltar", key="0", size=(24, 1))],
+        ]
+
+        # Cria a janela de opções e espera a ação escolhida pelo usuário.
+        window = sg.Window("Gerenciar Pessoas", layout, modal=True, finalize=True)
+        event, _ = window.read()
+        window.close()
+
+        # Retorna -1 caso a janela seja fechada sem escolha.
+        if event in (None, ""):
+            return -1
+        return int(event)
+
     def pega_dados_paciente(self):
-        nome = input("Nome: ")
+        # Coleta os dados de cadastro de um paciente.
+        # Os valores são retornados em uma estrutura simples para o controlador.
+        layout = [
+            [sg.Text("Cadastro de Paciente", font=("Helvetica", 16, "bold"))],
+            [sg.Text("Nome"), sg.Input(key="nome")],
+            [sg.Text("Idade"), sg.Input(key="idade")],
+            [sg.Text("Celular"), sg.Input(key="celular")],
+            [sg.Text("CPF"), sg.Input(key="cpf")],
+            [sg.Button("Salvar", key="salvar"), sg.Button("Cancelar", key="cancelar")],
+        ]
+
         while True:
-            try:
-                idade = int(input("Idade: "))
-                break
-            except ValueError:
-                print(" Digite um número válido!")
-                # loop para um int
-        celular = input("Celular: ")
-        cpf = input("CPF: ")
-        return nome, idade, celular, cpf
+            window = sg.Window("Cadastro de Paciente", layout, modal=True, finalize=True)
+            event, values = window.read()
+            window.close()
 
-# método para pegar os dados dos profissionais, tratando a exceção caso o usuário digite um valor inválido para o registro do profissional---------------------------------------
+            # Se o usuário cancelar, interrompe o cadastro.
+            if event in (None, "cancelar"):
+                return None
+
+            # Se salvar, valida a idade e retorna os dados digitados.
+            if event == "salvar":
+                try:
+                    idade = int(values["idade"])
+                    return values["nome"], idade, values["celular"], values["cpf"]
+                except ValueError:
+                    self.mostra_mensagem("Digite uma idade válida.")
+
     def pega_dados_profissional(self):
-        nome = input("Nome: ")
-        celular = input("Celular: ")
-        cpf = input("CPF: ")
-        especialidade = input("Especialidade: ")
-        registro = input("Registro profissional: ")
-        return nome, celular, cpf, especialidade, registro
+        # Coleta os dados de cadastro de um profissional.
+        # Os campos são reunidos em uma tupla para uso posterior.
+        layout = [
+            [sg.Text("Cadastro de Profissional", font=("Helvetica", 16, "bold"))],
+            [sg.Text("Nome"), sg.Input(key="nome")],
+            [sg.Text("Celular"), sg.Input(key="celular")],
+            [sg.Text("CPF"), sg.Input(key="cpf")],
+            [sg.Text("Especialidade"), sg.Input(key="especialidade")],
+            [sg.Text("Registro"), sg.Input(key="registro")],
+            [sg.Button("Salvar", key="salvar"), sg.Button("Cancelar", key="cancelar")],
+        ]
 
-# método para selecionar o CPF de uma pessoa, para ser usado na alteração e remoção de pessoas---------------------------------------------------------------------------------------
+        window = sg.Window("Cadastro de Profissional", layout, modal=True, finalize=True)
+        event, values = window.read()
+        window.close()
+
+        # Se o usuário cancelar, retorna None para encerrar o fluxo.
+        if event in (None, "cancelar"):
+            return None
+
+        # Retorna os dados coletados em ordem esperada pelo controlador.
+        return values["nome"], values["celular"], values["cpf"], values["especialidade"], values["registro"]
+
     def seleciona_cpf(self):
-        return input("CPF da pessoa: ")
+        # Solicita o CPF de uma pessoa para alteração ou remoção.
+        layout = [
+            [sg.Text("CPF da pessoa")],
+            [sg.Input(key="cpf")],
+            [sg.Button("OK"), sg.Button("Cancelar")],
+        ]
 
-# método para mostrar a lista de pessoas, mostrando uma mensagem caso não haja pessoas cadastradas---------------------------------------------------------------------------------------
+        window = sg.Window("Selecionar CPF", layout, modal=True, finalize=True)
+        event, values = window.read()
+        window.close()
+
+        if event in (None, "Cancelar"):
+            return None
+        return values["cpf"]
+
     def mostra_pessoas(self, pessoas):
+        # Exibe a lista de pessoas cadastradas em uma janela rolável.
+        # Útil para mostrar todos os cadastros de forma organizada.
         if not pessoas:
-            print("Nenhuma pessoa cadastrada.")
+            self.mostra_mensagem("Nenhuma pessoa cadastrada.")
             return
 
-        print("\nPessoas cadastradas:")
+        texto = []
         for pessoa in pessoas:
-            self.mostra_pessoa(pessoa)
-            print("-" * 30)
+            texto.append(self.mostra_pessoa(pessoa))
+            texto.append("-" * 30)
 
-# método para mostrar os dados de uma pessoa, identificando se é um paciente ou profissional e mostrando as informações correspondentes---------------------------------------------------------------------------------------
+        sg.popup_scrolled("\n".join(texto), title="Pessoas cadastradas", size=(80, 20))
+
     def mostra_pessoa(self, pessoa):
+        # Formata os dados de uma pessoa para apresentação na tela.
+        # Diferencia paciente e profissional conforme o tipo da instância.
         tipo = "Paciente" if isinstance(pessoa, Paciente) else "Profissional"
-        print(f"Tipo: {tipo}")
-        print(f"Nome: {pessoa.nome}")
-        print(f"Celular: {pessoa.celular}")
-        print(f"CPF: {pessoa.cpf}")
+        linhas = [
+            f"Tipo: {tipo}",
+            f"Nome: {pessoa.nome}",
+            f"Celular: {pessoa.celular}",
+            f"CPF: {pessoa.cpf}",
+        ]
 
         if isinstance(pessoa, Paciente):
-            print(f"Idade: {pessoa.idade}")
+            linhas.append(f"Idade: {pessoa.idade}")
         elif isinstance(pessoa, Profissional):
-            print(f"Especialidade: {pessoa.especialidade}")
-            print(f"Registro: {pessoa.registro}")
+            linhas.append(f"Especialidade: {pessoa.especialidade}")
+            linhas.append(f"Registro: {pessoa.registro}")
+
+        return "\n".join(linhas)
 
     def mostra_mensagem(self, msg):
-        print(msg)
+        # Exibe uma mensagem de aviso ou confirmação ao usuário.
+        # Serve como feedback visual para operações realizadas.
+        try:
+            sg.popup(msg, title="Mensagem")
+        except Exception:
+            print(msg)

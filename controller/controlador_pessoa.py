@@ -64,7 +64,7 @@ class ControladorPessoa:
 
 # método para buscar um profissional pelo registro, retornando None caso o profissional não seja encontrado ou caso a pessoa encontrada não seja um profissional---------------------------------------------------------------------------------------
     def buscar_profissional_por_registro(self, registro):
-        for pessoa in self.__pessoas:
+        for pessoa in self.__pessoas_dao.get_all():
             if isinstance(pessoa, Profissional) and pessoa.registro == registro:
                 return pessoa
         return None
