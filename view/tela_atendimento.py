@@ -1,60 +1,83 @@
-class Tela_Atendimento:
-    def tela_opcoes(self):
-        print("\n" + "="*30)
-        print("--- MENU ATENDIMENTO ---")
-        print("1 - Agendar Atendimento")
-        print("2 - Alterar Atendimento")
-        print("3 - Listar Atendimentos")
-        print("4 - Cancelar/Excluir Atendimento")
-        print("0 - Retornar")
-        print("="*30)
+import FreeSimpleGUI as sg
 
-        try:
-            opcao = int(input("Escolha a opção: "))
-            return opcao
-        except ValueError:
-            return -1
+sg.LOOK_AND_FEEL_TABLE['TemaClinica'] = {
+    'BACKGROUND': '#F7F9F9', 'TEXT': '#2C3E50', 'INPUT': '#FFFFFF', 'TEXT_INPUT': '#000000',
+    'SCROLL': '#E3EAEA', 'BUTTON': ('#FFFFFF', '#009688'), 'PROGRESS': ('#009688', '#FFFFFF'),
+    'BORDER': 1, 'SLIDER_DEPTH': 0, 'PROGRESS_DEPTH': 0
+}
+
+class Tela_Atendimento:
+    def __init__(self):
+        sg.theme('TemaClinica')
+        self.font_padrao = ("Helvetica", 11)
+        self.font_titulo = ("Helvetica", 14, "bold")
+
+    def tela_opcoes(self):
+        # Menu de Atendimento: Agendar, Alterar, Listar, Cancelar/Excluir, Retornar[cite: 10]
+        layout = [
+            [sg.Text("--- MENU ATENDIMENTO ---", font=self.font_titulo, justification='center', expand_x=True)],
+            [sg.Button("1 - Agendar Atendimento", key=1, border_width=0, font=self.font_padrao, expand_x=True)],
+            [sg.Button("2 - Alterar Atendimento", key=2, border_width=0, font=self.font_padrao, expand_x=True)],
+            [sg.Button("3 - Listar Atendimentos", key=3, border_width=0, font=self.font_padrao, expand_x=True)],
+            [sg.Button("4 - Cancelar/Excluir Atendimento", key=4, border_width=0, font=self.font_padrao, expand_x=True)],
+            [sg.Button("0 - Retornar", key=0, border_width=0, font=self.font_padrao, expand_x=True)]
+        ]
+        window = sg.Window("Sistema - Atendimentos", layout, size=(300, 250), element_justification='c')
+        event, _ = window.read()
+        window.close()
+        
+        if event == sg.WIN_CLOSED: return -1
+        return event
 
     def pega_dados_atendimento(self):
-        print("\n--- DADOS DO AGENDAMENTO ---")
-        cpf_paciente = input("CPF do Paciente: ")
-        nome_clinica = input("Nome da Clínica: ")
-        registro_profissional = input("Registro do Profissional: ")
-        data = input("Data (DD/MM/AAAA): ")
-        hora_inicio = input("Hora de Início: ")
-        hora_fim = input("Hora de Fim: ")
-        tipo = input("Tipo (Consulta, Exame, Retorno): ")
+        layout = [
+            [sg.Text("--- DADOS DO AGENDAMENTO ---", font=self.font_titulo)],
+            [sg.Text("CPF do Paciente:", size=(20, 1)), sg.InputText(key='cpf_paciente')],
+            [sg.Text("Nome da Clínica:", size=(20, 1)), sg.InputText(key='nome_clinica')],
+            [sg.Text("Registro do Profissional:", size=(20, 1)), sg.InputText(key='registro_profissional')],
+            [sg.Text("Data (DD/MM/AAAA):", size=(20, 1)), sg.InputText(key='data')],
+            [sg.Text("Hora de Início:", size=(20, 1)), sg.InputText(key='hora_inicio')],
+            [sg.Text("Hora de Fim:", size=(20, 1)), sg.InputText(key='hora_fim')],
+            [sg.Text("Tipo (Consulta, Exame...):", size=(20, 1)), sg.InputText(key='tipo')],
+            [sg.Text("Valor Total: R$", size=(20, 1)), sg.InputText(key='valor_total')],
+            [sg.Button("Confirmar", border_width=0, pad=(10, 20)), sg.Button("Cancelar", border_width=0, button_color=('white', '#E74C3C'))]
+        ]
+        window = sg.Window("Agendar Atendimento", layout, font=self.font_padrao)
+        event, values = window.read()
+        window.close()
 
+        if event in (sg.WIN_CLOSED, "Cancelar"): return None
+
+        # Exige conversão para float no valor total e prevê erro[cite: 10]
         try:
-            valor_total = float(input("Valor Total: R$ "))
+            valor = float(values['valor_total'])
         except ValueError:
-            print(">>> Erro: Valor deve ser numérico! Tente novamente.")
+            self.mostra_mensagem("Erro: Valor deve ser numérico! Tente novamente.")
             return None
 
         return {
-            "cpf_paciente": cpf_paciente,
-            "nome_clinica": nome_clinica,
-            "registro_profissional": registro_profissional,
-            "data": data,
-            "hora_inicio": hora_inicio,
-            "hora_fim": hora_fim,
-            "tipo": tipo,
-            "valor_total": valor_total
+            "cpf_paciente": values['cpf_paciente'],
+            "nome_clinica": values['nome_clinica'],
+            "registro_profissional": values['registro_profissional'],
+            "data": values['data'],
+            "hora_inicio": values['hora_inicio'],
+            "hora_fim": values['hora_fim'],
+            "tipo": values['tipo'],
+            "valor_total": valor
         }
 
     def mostra_atendimento(self, atendimentos):
-        print("\n--- LISTA DE ATENDIMENTOS ---")
+        texto = ""
         for a in atendimentos:
-            print(
-                f"Data: {a.data} | Horário: {a.horario_inicio} às {a.horario_fim}")
-            print(
-                f"Tipo: {a.tipo_atendimento} | Valor Devido: R$ {a.valor_total:.2f}")
-            print("-" * 30)
+            # Exibe data, horários, tipo e valor devido[cite: 10]
+            texto += f"Data: {a.data} | Horário: {a.horario_inicio} às {a.horario_fim}\n"
+            texto += f"Tipo: {a.tipo_atendimento} | Valor Devido: R$ {a.valor_total:.2f}\n"
+            texto += "-" * 40 + "\n"
+        sg.popup_scrolled(texto, title="--- Lista de Atendimentos ---", size=(50, 15), font=self.font_padrao)
 
     def seleciona_atendimento(self):
-        identificador = input(
-            "Digite a DATA (ou ID) do atendimento que deseja selecionar: ")
-        return identificador
+        # Permite selecionar via DATA ou ID[cite: 10]
+        return sg.popup_get_text("Digite a DATA (ou ID) do atendimento que deseja selecionar:", title="Selecionar", font=self.font_padrao)
 
     def mostra_mensagem(self, msg):
-        print(f"\n>>> {msg}")
+        sg.popup(msg, title="Aviso", font=self.font_padrao)

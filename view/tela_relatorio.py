@@ -1,54 +1,67 @@
+import FreeSimpleGUI as sg
+
+sg.LOOK_AND_FEEL_TABLE['TemaClinica'] = {
+    'BACKGROUND': '#F7F9F9', 'TEXT': '#2C3E50', 'INPUT': '#FFFFFF', 'TEXT_INPUT': '#000000',
+    'SCROLL': '#E3EAEA', 'BUTTON': ('#FFFFFF', '#009688'), 'PROGRESS': ('#009688', '#FFFFFF'),
+    'BORDER': 1, 'SLIDER_DEPTH': 0, 'PROGRESS_DEPTH': 0
+}
+
 class TelaRelatorio:
+    def __init__(self):
+        sg.theme('TemaClinica')
+        self.font_padrao = ("Helvetica", 11)
+        self.font_titulo = ("Helvetica", 14, "bold")
 
-# método para mostrar as opções do menu de relatórios, tratando a exceção caso o usuário digite um valor inválido---------------------------------------
     def tela_opcoes(self):
-        print("\n--- Relatórios ---")
-        print("1. Clínicas com mais atendimentos")
-        print("2. Atendimentos mais caros e mais baratos")
-        print("3. Procedimentos mais realizados")
-        print("4. Procedimentos mais caros e mais baratos")
-        print("0. Voltar")
+        # Menu com as opções 1 a 4 de relatórios e 0 para voltar[cite: 9]
+        layout = [
+            [sg.Text("--- RELATÓRIOS ---", font=self.font_titulo, justification='center', expand_x=True)],
+            [sg.Button("1. Clínicas com mais atendimentos", key=1, border_width=0, font=self.font_padrao, expand_x=True)],
+            [sg.Button("2. Atendimentos mais caros e baratos", key=2, border_width=0, font=self.font_padrao, expand_x=True)],
+            [sg.Button("3. Procedimentos mais realizados", key=3, border_width=0, font=self.font_padrao, expand_x=True)],
+            [sg.Button("4. Procedimentos mais caros e baratos", key=4, border_width=0, font=self.font_padrao, expand_x=True)],
+            [sg.Button("0. Voltar", key=0, border_width=0, font=self.font_padrao, expand_x=True)]
+        ]
+        window = sg.Window("Sistema - Relatórios", layout, size=(350, 250), element_justification='c')
+        event, _ = window.read()
+        window.close()
+        
+        if event == sg.WIN_CLOSED: return -1
+        return event
 
-        try:
-            opcao = int(input("Escolha a opção: "))
-        except ValueError:
-            print(" Digite um número válido!")
-            opcao = -1
-        return opcao
-
-# método para mostrar mensagens para o usuário---------------------------------------------------------------------------------------
     def mostra_mensagem(self, mensagem):
-        print(mensagem)
+        sg.popup(mensagem, title="Aviso", font=self.font_padrao)
 
-# métodos para mostrar os relatórios, tratando as exceções caso não haja dados para gerar os relatórios---------------------------------------
     def mostra_relatorio_clinicas_mais_atendimentos(self, relatorio):
-        print("\n--- Relatório: Clínicas com mais atendimentos ---")
+        # Exibe o nome da clínica e quantidade de atendimentos[cite: 9]
         if not relatorio:
-            print("Nenhum dado encontrado para este relatório.")
+            self.mostra_mensagem("Nenhum dado encontrado para este relatório.")
             return
+        
+        texto = ""
         for nome, quantidade in relatorio:
-            print(f"Clínica: {nome} | Atendimentos: {quantidade}")
+            texto += f"Clínica: {nome} | Atendimentos: {quantidade}\n"
+        sg.popup_scrolled(texto, title="Clínicas com mais atendimentos", size=(40, 10), font=self.font_padrao)
 
-#   método para mostrar o relatório dos atendimentos mais caros e mais baratos, tratando as exceções caso não haja atendimentos para gerar o relatório
     def mostra_relatorio_atendimentos_mais_caros_eh_baratos(self, mais_caro, mais_barato):
-        print("\n--- Relatório: Atendimentos mais caros e mais baratos ---")
-        print(
-            f"Mais caro: Clínica {mais_caro.clinica.nome} | Valor: {mais_caro.valor_total}")
-        print(
-            f"Mais barato: Clínica {mais_barato.clinica.nome} | Valor: {mais_barato.valor_total}")
+        # Exibe os dados do atendimento mais caro e do mais barato (Clínica e Valor)[cite: 9]
+        texto = f"Mais caro: Clínica {mais_caro.clinica.nome} | Valor: {mais_caro.valor_total}\n\n"
+        texto += f"Mais barato: Clínica {mais_barato.clinica.nome} | Valor: {mais_barato.valor_total}"
+        sg.popup(texto, title="Atendimentos mais caros e mais baratos", font=self.font_padrao)
 
-# método para mostrar o relatório dos procedimentos mais realizados, tratando as exceções caso não haja procedimentos para gerar o relatório
     def mostra_relatorio_procedimentos_mais_realizados(self, relatorio):
-        print("\n--- Relatório: Procedimentos mais realizados ---")
+        # Exibe a descrição do procedimento e sua quantidade[cite: 9]
         if not relatorio:
-            print("Nenhum dado encontrado para este relatório.")
+            self.mostra_mensagem("Nenhum dado encontrado para este relatório.")
             return
+        
+        texto = ""
         for descricao, quantidade in relatorio:
-            print(f"Procedimento: {descricao} | Quantidade: {quantidade}")
+            texto += f"Procedimento: {descricao} | Quantidade: {quantidade}\n"
+        sg.popup_scrolled(texto, title="Procedimentos mais realizados", size=(40, 10), font=self.font_padrao)
 
-# método para mostrar o relatório dos procedimentos mais caros e mais baratos, tratando as exceções caso não haja procedimentos para gerar o relatório
     def mostra_relatorio_procedimentos_mais_caros_eh_baratos(self, mais_caro, mais_barato):
-        print("\n--- Relatório: Procedimentos mais caros e mais baratos ---")
-        print(f"Mais caro: {mais_caro.descricao} | Custo: {mais_caro.custo}")
-        print(
-            f"Mais barato: {mais_barato.descricao} | Custo: {mais_barato.custo}")
+        # Exibe o custo e descrição do procedimento mais caro e mais barato[cite: 9]
+        texto = f"Mais caro: {mais_caro.descricao} | Custo: {mais_caro.custo}\n\n"
+        texto += f"Mais barato: {mais_barato.descricao} | Custo: {mais_barato.custo}"
+        sg.popup(texto, title="Procedimentos mais caros e mais baratos", font=self.font_padrao)
