@@ -21,7 +21,7 @@ class Atendimento:
             raise ValueError("Atendimento fora do horário da clínica.")
 
         # ID amigável de 4 dígitos
-# Forçamos o ID a ser salvo como String (texto) para não perder zeros e bater com a tela
+        # Forçamos o ID a ser salvo como String (texto) para não perder zeros e bater com a tela
         self.__id = str(id_atendimento) if id_atendimento else str(random.randint(1000, 9999))
         self.__clinica = clinica
         self.__paciente = paciente
@@ -31,6 +31,9 @@ class Atendimento:
         self.__horario_fim = horario_fim
         self.__tipo = tipo
         self.__valor_total = valor_total
+        
+        # Eu crio essa lista vazia para armazenar os procedimentos que foram realizados especificamente durante este atendimento.
+        self.__procedimentos = []
 
     @property
     def id(self):
@@ -101,6 +104,15 @@ class Atendimento:
         if novo_valor < 0:
             raise ValueError("Valor inválido.")
         self.__valor_total = novo_valor
+
+    @property
+    def procedimentos(self):
+        # Eu retorno a lista de procedimentos vinculados ao atendimento.
+        return self.__procedimentos
+
+    def adicionar_procedimento(self, procedimento):
+        # Eu adiciono o procedimento passado por parâmetro à lista deste atendimento.
+        self.__procedimentos.append(procedimento)
 
     def __str__(self):
         return f"{self.__tipo} - {self.__data}"

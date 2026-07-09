@@ -4,15 +4,15 @@ from exceptions.elemento_repetido_exception import ElementoRepetidoException
 from view.tela_procedimento import TelaProcedimento
 from daos.procedimento_dao import ProcedimentoDAO
 
-
 class ControladorProcedimento:
     def __init__(self):
         self.__procedimentos_dao = ProcedimentoDAO()
         self.__tela_procedimento = TelaProcedimento()
 
-# Inclusão de um novo procedimento, verificando se já existe um procedimento com o mesmo ID para evitar duplicidade---------------------------------------------------------------------------------------
     def incluir_procedimento(self):
         dados = self.__tela_procedimento.pega_dados_procedimento()
+        if dados is None: return
+        
         try:
             novo_procedimento = Procedimento(
                 dados['descricao'], dados['custo'], dados['profissional_responsavel'], dados['id_procedimento'])
@@ -26,14 +26,12 @@ class ControladorProcedimento:
             self.__tela_procedimento.mostra_mensagem(
                 "Erro: Este elemento já existe. Tente novamente.")
 
-# Busca um procedimento pelo ID, lançando uma exceção caso o procedimento não seja encontrado---------------------------------------------------------------------------------------
     def buscar_procedimento_por_id(self, id_procedimento):
         procedimento = self.__procedimentos_dao.get(id_procedimento)
         if procedimento is None:
             raise ElementoNaoExisteException("Procedimento não encontrado.")
         return procedimento
 
-# Lista todos os procedimentos cadastrados, mostrando uma mensagem caso não haja procedimentos para listar---------------------------------------------------------------------------------------
     def listar_procedimentos(self):
         procedimentos = list(self.__procedimentos_dao.get_all())
         if not procedimentos:
@@ -43,12 +41,15 @@ class ControladorProcedimento:
         self.__tela_procedimento.mostra_procedimentos(procedimentos)
         return procedimentos
 
-# Altera os dados de um procedimento existente, verificando se o procedimento existe antes de tentar alterá-lo---------------------------------------------------------------------------------------
     def alterar_procedimento(self):
         id_sel = self.__tela_procedimento.seleciona_procedimento()
+        if id_sel is None: return
+        
         try:
             procedimento = self.buscar_procedimento_por_id(id_sel)
             dados = self.__tela_procedimento.pega_dados_procedimento()
+            if dados is None: return
+            
             procedimento.descricao = dados['descricao']
             procedimento.custo = dados['custo']
             procedimento.profissional_responsavel = dados['profissional_responsavel']
@@ -59,9 +60,10 @@ class ControladorProcedimento:
             self.__tela_procedimento.mostra_mensagem(
                 "Erro: Elemento não encontrado.")
 
-# Exclui um procedimento existente, verificando se o procedimento existe antes de tentar excluí-lo---------------------------------------------------------------------------------------
     def excluir_procedimento(self):
         id_sel = self.__tela_procedimento.seleciona_procedimento()
+        if id_sel is None: return
+        
         try:
             procedimento = self.buscar_procedimento_por_id(id_sel)
             self.__procedimentos_dao.remove(id_sel)
@@ -92,7 +94,21 @@ class ControladorProcedimento:
             if funcao_escolhida:
                 funcao_escolhida()
             else:
-                self.__tela_procedimento.mostra_mensagem(" Opção inválida!")
+                if opcao != -1: # Ignora aviso se apenas fechar a janela
+                    self.__tela_procedimento.mostra_mensagem(" Opção inválida!")
 
-            if opcao == 0:
+            if opcao in (0, -1):
                 continua = False
+
+    def selecionar_procedimento_existente(self):
+        # Eu crio este método para ser chamado por outros controladores.
+        # Ele lista o catálogo, pede para o usuário selecionar um ID e retorna o objeto do Procedimento.
+        self.listar_procedimentos()
+        id_sel = self.__tela_procedimento.seleciona_procedimento()
+        
+        if id_sel is not None:
+            try:
+                return self.buscar_procedimento_por_id(id_sel)
+            except ElementoNaoExisteException:
+                self.__tela_procedimento.mostra_mensagem("Erro: Procedimento não encontrado no catálogo.")
+        return None

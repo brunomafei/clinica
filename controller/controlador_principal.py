@@ -6,16 +6,22 @@ from controller.controlador_procedimento import ControladorProcedimento
 from controller.controlador_relatorio import ControladorRelatorio
 from view.tela_principal import TelaPrincipal
 
-
 class ControladorPrincipal:
     def __init__(self):
         self.__controlador_pessoa = ControladorPessoa()
         self.__controlador_clinica = ControladorClinica()
+        self.__controlador_procedimento = ControladorProcedimento()
+        
+        # Injeção ajustada: agora passamos o controlador de procedimento também!
         self.__controlador_atendimento = ControladorAtendimento(
-            self.__controlador_pessoa, self.__controlador_clinica)
+            self.__controlador_pessoa, 
+            self.__controlador_clinica,
+            self.__controlador_procedimento
+        )
+        
         self.__controlador_pagamento = ControladorPagamento(
             self.__controlador_atendimento)
-        self.__controlador_procedimento = ControladorProcedimento()
+            
         self.__controlador_relatorio = ControladorRelatorio(
             self.__controlador_clinica,
             self.__controlador_procedimento,

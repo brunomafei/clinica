@@ -3,25 +3,27 @@ from view.tela_atendimento import Tela_Atendimento
 from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
 from daos.atendimento_dao import AtendimentoDAO
 
-
 class ControladorAtendimento:
-    def __init__(self, controlador_pessoa, controlador_clinica):
+    # Eu adiciono o controlador_procedimento no init para poder acessar o catálogo de procedimentos
+    def __init__(self, controlador_pessoa, controlador_clinica, controlador_procedimento):
         self.__atendimentos_dao = AtendimentoDAO()
         self.__tela_atendimento = Tela_Atendimento()
         self.__controlador_pessoa = controlador_pessoa
         self.__controlador_clinica = controlador_clinica
+        self.__controlador_procedimento = controlador_procedimento
 
     def abre_tela(self):
         lista_opcoes = {
             1: self.incluir_atendimento,
             2: self.alterar_atendimento,
             3: self.listar_atendimentos,
-            4: self.excluir_atendimento
+            4: self.excluir_atendimento,
+            5: self.registrar_procedimento_no_atendimento # Nova opção do menu
         }
 
         while True:
             opcao = self.__tela_atendimento.tela_opcoes()
-            if opcao == 0:
+            if opcao in (0, -1):
                 break
 
             funcao = lista_opcoes.get(opcao)
@@ -83,7 +85,6 @@ class ControladorAtendimento:
                 novos_dados = self.__tela_atendimento.pega_dados_atendimento()
 
                 if novos_dados is not None:
-                    # Validação de horário também na alteração baseada na clínica já associada
                     if novos_dados["hora_inicio"] < atendimento.clinica.horario_abertura or novos_dados["hora_fim"] > atendimento.clinica.horario_fechamento:
                         raise ValueError(f"O horário deve estar dentro do período de funcionamento da clínica ({atendimento.clinica.horario_abertura} às {atendimento.clinica.horario_fechamento}).")
 
@@ -127,3 +128,26 @@ class ControladorAtendimento:
 
     def buscar_atendimento_por_id(self, id_buscado):
         return self.__atendimentos_dao.get(id_buscado)
+
+    # Eu crio este método para pegar um atendimento, pegar um procedimento do catálogo e uni-los.
+    def registrar_procedimento_no_atendimento(self):
+        self.listar_atendimentos()
+        id_atendimento = self.__tela_atendimento.seleciona_atendimento()
+
+        if id_atendimento is not None:
+            try:
+                atendimento = self.buscar_atendimento_por_id(id_atendimento)
+                if atendimento is None:
+                    raise ElementoNaoExisteException("Atendimento não encontrado.")
+                
+                # Eu uso o controlador de procedimentos para resgatar um procedimento do nosso catálogo.
+                procedimento_selecionado = self.__controlador_procedimento.selecionar_procedimento_existente()
+                
+                if procedimento_selecionado is not None:
+                    # Eu vinculo o procedimento ao atendimento e salvo a atualização no DAO.
+                    atendimento.adicionar_procedimento(procedimento_selecionado)
+                    self.__atendimentos_dao.add(atendimento)
+                    self.__tela_atendimento.mostra_mensagem("Procedimento registrado no atendimento com sucesso!")
+                    
+            except Exception as e:
+                self.__tela_atendimento.mostra_mensagem(str(e))

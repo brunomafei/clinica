@@ -19,9 +19,11 @@ class Tela_Atendimento:
             [sg.Button("2 - Alterar Atendimento", key=2, border_width=0, font=self.font_padrao, expand_x=True)],
             [sg.Button("3 - Listar Atendimentos", key=3, border_width=0, font=self.font_padrao, expand_x=True)],
             [sg.Button("4 - Cancelar/Excluir Atendimento", key=4, border_width=0, font=self.font_padrao, expand_x=True)],
+            # Eu crio este novo botão para permitir o registro do procedimento dentro da consulta.
+            [sg.Button("5 - Registrar Procedimento no Atendimento", key=5, border_width=0, font=self.font_padrao, expand_x=True)],
             [sg.Button("0 - Retornar", key=0, border_width=0, font=self.font_padrao, expand_x=True)]
         ]
-        window = sg.Window("Sistema - Atendimentos", layout, size=(300, 250), element_justification='c')
+        window = sg.Window("Sistema - Atendimentos", layout, size=(300, 280), element_justification='c')
         event, _ = window.read()
         window.close()
         
@@ -67,11 +69,23 @@ class Tela_Atendimento:
     def mostra_atendimento(self, atendimentos):
         texto = ""
         for a in atendimentos:
-            # REQUISITO 6: Adicionada a exibição limpa do ID do atendimento na listagem
+            # REQUISITO 6: Exibição limpa do ID do atendimento na listagem
             texto += f"ID: {a.id} | Data: {a.data} | Horário: {a.horario_inicio} às {a.horario_fim}\n"
             texto += f"Tipo: {a.tipo} | Valor Devido: R$ {a.valor_total:.2f}\n"
-            texto += "-" * 40 + "\n"
-        sg.popup_scrolled(texto, title="--- Lista de Atendimentos ---", size=(50, 15), font=self.font_padrao)
+            
+            # --- NOVA PARTE: Aqui eu puxo e mostro os procedimentos vinculados ---
+            if a.procedimentos:
+                texto += "Procedimentos Realizados:\n"
+                for proc in a.procedimentos:
+                    texto += f"  -> {proc.descricao} (Custo: R$ {proc.custo:.2f})\n"
+            else:
+                texto += "Procedimentos Realizados: Nenhum\n"
+            # ---------------------------------------------------------------------
+            
+            texto += "-" * 50 + "\n"
+            
+        # Eu aumentei a largura de (50, 15) para (60, 15) para acomodar melhor os novos dados
+        sg.popup_scrolled(texto, title="--- Lista de Atendimentos ---", size=(60, 15), font=self.font_padrao)
 
     def seleciona_atendimento(self):
         return sg.popup_get_text("Digite o ID do atendimento que deseja selecionar:", title="Selecionar", font=self.font_padrao)
