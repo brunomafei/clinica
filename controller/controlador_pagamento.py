@@ -1,4 +1,5 @@
-from model.pagamento import Pagamento_pix, Pagamento_cartao, Pagamento_cedula
+from datetime import datetime
+from model.pagamento import PagamentoPix, PagamentoCartao, PagamentoCedula
 from view.tela_pagamento import Tela_Pagamento
 from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
 from daos.pagamento_dao import PagamentoDAO
@@ -39,23 +40,40 @@ class ControladorPagamento:
                     raise ElementoNaoExisteException(
                         "Atendimento não encontrado.")
 
+                # REQUISITO 3: Validação da data de pagamento
+                try:
+                    data_pagamento = datetime.strptime(dados["data"], "%d/%m/%Y")
+                    data_atendimento = datetime.strptime(atendimento.data, "%d/%m/%Y")
+                    
+                    if data_pagamento > data_atendimento:
+                        raise ValueError("O pagamento deve ser realizado até a data do atendimento.")
+                except ValueError as ve:
+                    # Captura tanto o erro da nossa regra de negócio quanto formato de data inválido
+                    raise ValueError(f"Erro de data: {ve}. Certifique-se de usar o formato DD/MM/AAAA.")
+
                 novo_pagamento = None
                 tipo = dados["tipo"]
 
+                # REQUISITO 8: Instanciação usando o padrão PEP8
                 if tipo == "PIX":
-                    novo_pagamento = Pagamento_pix(
+                    novo_pagamento = PagamentoPix(
                         dados["data"], dados["valor"], dados["chave_pix"], atendimento)
                 elif tipo == "CARTAO":
-                    novo_pagamento = Pagamento_cartao(
+                    novo_pagamento = PagamentoCartao(
                         dados["data"], dados["valor"], dados["numero_cartao"], dados["bandeira"], atendimento)
                 elif tipo == "CEDULA":
-                    novo_pagamento = Pagamento_cedula(
+                    novo_pagamento = PagamentoCedula(
                         dados["data"], dados["valor"], atendimento)
                 else:
                     raise ValueError("Tipo inválido.")
 
                 self.__pagamentos_dao.add(novo_pagamento)
+                
+                # Atualiza o valor total do atendimento (verifique se na model o setter está configurado)
                 atendimento.valor_total -= dados["valor"]
+                # Atualiza o atendimento no DAO de atendimentos para salvar o novo valor
+                self.__controlador_atendimento._ControladorAtendimento__atendimentos_dao.add(atendimento)
+                
                 self.__tela_pagamento.mostra_mensagem(
                     f"Pago! Valor restante: R${atendimento.valor_total:.2f}")
 

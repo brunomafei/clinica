@@ -75,41 +75,41 @@ class ControladorPessoa:
         pessoa = self.buscar_pessoa_por_cpf(cpf)
 
         if pessoa is not None:
-            novo_nome = input("Novo nome: ")
-            novo_celular = input("Novo celular: ")
-            novo_cpf = input("Novo CPF: ")
+            # Chamamos a tela em vez de usar input()
+            novos_dados = self.__tela_pessoa.pega_dados_alteracao_pessoa(pessoa)
 
-            try:
-                if pessoa.cpf != novo_cpf and self.buscar_pessoa_por_cpf(novo_cpf) is not None:
-                    raise ElementoRepetidoException(
-                        "O novo CPF informado já pertence a outra pessoa.")
+            if novos_dados is not None:
+                try:
+                    novo_cpf = novos_dados["cpf"]
+                    # Verifica se mudou de CPF e se o novo já existe
+                    if pessoa.cpf != novo_cpf and self.buscar_pessoa_por_cpf(novo_cpf) is not None:
+                        raise ElementoRepetidoException(
+                            "O novo CPF informado já pertence a outra pessoa.")
 
-                pessoa.nome = novo_nome
-                pessoa.celular = novo_celular
-                pessoa.cpf = novo_cpf
+                    # Se o CPF mudar, precisamos remover o registro antigo do DAO antes de salvar o novo
+                    cpf_antigo = pessoa.cpf
+                    if cpf_antigo != novo_cpf:
+                        self.__pessoas_dao.remove(cpf_antigo)
 
-                if isinstance(pessoa, Paciente):
-                    while True:
-                        try:
-                            nova_idade = int(input("Nova idade: "))
-                            break
-                        except ValueError:
-                            print(" Digite um número válido!")
-                            # loop para um int
-                    nova_idade = int(input("Nova idade: "))
-                    pessoa.idade = nova_idade
+                    pessoa.nome = novos_dados["nome"]
+                    pessoa.celular = novos_dados["celular"]
+                    pessoa.cpf = novo_cpf
 
-                elif isinstance(pessoa, Profissional):
-                    nova_especialidade = input("Nova especialidade: ")
-                    novo_registro = input("Novo registro: ")
-                    pessoa.especialidade = nova_especialidade
-                    pessoa.registro = novo_registro
+                    if isinstance(pessoa, Paciente):
+                        pessoa.idade = novos_dados["idade"]
 
-                self.__tela_pessoa.mostra_mensagem(
-                    "Pessoa alterada com sucesso.")
-            except ElementoRepetidoException:
-                self.__tela_pessoa.mostra_mensagem(
-                    "Erro: Este elemento já existe. Tente novamente.")
+                    elif isinstance(pessoa, Profissional):
+                        pessoa.especialidade = novos_dados["especialidade"]
+                        pessoa.registro = novos_dados["registro"]
+
+                    # Atualiza o objeto no DAO com a nova chave (CPF)
+                    self.__pessoas_dao.add(pessoa)
+
+                    self.__tela_pessoa.mostra_mensagem(
+                        "Pessoa alterada com sucesso.")
+                except ElementoRepetidoException:
+                    self.__tela_pessoa.mostra_mensagem(
+                        "Erro: Este elemento já existe. Tente novamente.")
         else:
             self.__tela_pessoa.mostra_mensagem("Pessoa não encontrada.")
 

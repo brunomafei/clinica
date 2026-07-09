@@ -6,8 +6,8 @@ class ClinicaDAO(DAO):
         super().__init__('clinicas.pkl')
 
     def add(self, clinica: Clinica):
-        if isinstance(clinica, Clinica) and clinica.nome:
-            super().add(clinica.nome, clinica) # Usando o nome como chave
+        if isinstance(clinica, Clinica) and clinica.cnpj:
+            super().add(clinica.cnpj, clinica)
 
     def get(self, key: str):
         if isinstance(key, str):

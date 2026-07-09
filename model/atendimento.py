@@ -1,8 +1,8 @@
+import uuid
 from datetime import date, time
 
 
 class Atendimento:
-
     def __init__(self,
                  clinica,
                  paciente,
@@ -10,20 +10,30 @@ class Atendimento:
                  data: date,
                  horario_inicio: time,
                  horario_fim: time,
-                 tipo_atendimento: str,
-                 valor_total: float):
+                 tipo: str,
+                 valor_total: float,
+                 id_atendimento=None):
+
+        # Regras de Negócio
+        if not paciente.eh_maior_de_idade():
+            raise ValueError("Somente pacientes com mais de 18 anos completos podem realizar atendimentos de forma independente.")
 
         if not clinica.horario_funcionamento(horario_inicio, horario_fim):
             raise ValueError("Atendimento fora do horário da clínica.")
 
+        self.__id = id_atendimento if id_atendimento else str(uuid.uuid4())
         self.__clinica = clinica
         self.__paciente = paciente
         self.__profissional = profissional
         self.__data = data
         self.__horario_inicio = horario_inicio
         self.__horario_fim = horario_fim
-        self.__tipo_atendimento = tipo_atendimento
+        self.__tipo = tipo
         self.__valor_total = valor_total
+
+    @property
+    def id(self):
+        return self.__id
 
     @property
     def clinica(self):
@@ -74,12 +84,12 @@ class Atendimento:
         self.__horario_fim = horario
 
     @property
-    def tipo_atendimento(self):
-        return self.__tipo_atendimento
+    def tipo(self):
+        return self.__tipo
 
-    @tipo_atendimento.setter
-    def tipo_atendimento(self, tipo):
-        self.__tipo_atendimento = tipo
+    @tipo.setter
+    def tipo(self, tipo):
+        self.__tipo = tipo
 
     @property
     def valor_total(self):
@@ -92,4 +102,4 @@ class Atendimento:
         self.__valor_total = novo_valor
 
     def __str__(self):
-        return f"{self.__tipo_atendimento} - {self.__data}"
+        return f"{self.__tipo} - {self.__data}"

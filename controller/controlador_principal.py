@@ -51,7 +51,7 @@ class ControladorPrincipal:
         while True:
             opcao = self.__tela_principal.tela_opcoes()
 
-            if opcao == 0:
+            if opcao in (0, -1):
                 break
             elif opcao == 1:
                 self.__controlador_atendimento.abre_tela()
