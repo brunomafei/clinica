@@ -20,7 +20,6 @@ class Tela_Pagamento:
         self.font_titulo = ("Helvetica", 14, "bold")
 
     def tela_opcoes(self):
-        # Opções do Menu Pagamento: 1 - Registrar, 2 - Listar, 0 - Retornar[cite: 2]
         layout = [
             [sg.Text("--- MENU PAGAMENTO ---", font=self.font_titulo, justification='center', expand_x=True)],
             [sg.Button("1 - Registrar Pagamento", key=1, border_width=0, font=self.font_padrao, expand_x=True)],
@@ -33,17 +32,16 @@ class Tela_Pagamento:
         window.close()
 
         if event == sg.WIN_CLOSED:
-            return -1 # Retorno de erro no caso de fechar a janela[cite: 2]
+            return -1 
         
         return event
 
     def pega_dados_pagamento(self):
-        # Janela principal para ID, Data, Valor e seleção de Tipo[cite: 2]
         tipos_disponiveis = ['PIX', 'CARTAO', 'CEDULA']
         
         layout = [
             [sg.Text("--- DADOS DO PAGAMENTO ---", font=self.font_titulo)],
-            [sg.Text("ID ou Data do Atendimento:", size=(22, 1)), sg.InputText(key='id_atendimento')],
+            [sg.Text("ID do Atendimento:", size=(22, 1)), sg.InputText(key='id_atendimento')],
             [sg.Text("Data (DD/MM/AAAA):", size=(22, 1)), sg.InputText(key='data')],
             [sg.Text("Valor a ser pago: R$", size=(22, 1)), sg.InputText(key='valor')],
             [sg.Text("Modalidade:", size=(22, 1)), sg.Combo(tipos_disponiveis, key='tipo', readonly=True, size=(20, 1))],
@@ -57,7 +55,6 @@ class Tela_Pagamento:
         if event in (sg.WIN_CLOSED, "Cancelar"):
             return None
 
-        # Validação do valor numérico exigida pela regra original[cite: 2]
         try:
             valor_float = float(values['valor'])
         except ValueError:
@@ -71,7 +68,6 @@ class Tela_Pagamento:
             "tipo": values['tipo']
         }
 
-        # Fluxos condicionais dependendo do tipo selecionado[cite: 2]
         if dados["tipo"] == "PIX":
             chave = sg.popup_get_text("Digite a chave PIX:", title="Dados PIX", font=self.font_padrao)
             if chave is None: return None
@@ -98,10 +94,9 @@ class Tela_Pagamento:
     def mostra_pagamentos(self, pagamentos):
         texto = ""
         for p in pagamentos:
-            # Exibe Data e Valor Pago[cite: 2]
-            texto += f"Data: {p.data} | Valor Pago: R$ {p.valor_pago:.2f}\n"
+            # REQUISITO 5: Exibe o ID gerado para o pagamento
+            texto += f"ID Pagamento: {p.id} | Data: {p.data} | Valor Pago: R$ {p.valor:.2f}\n"
 
-            # Identifica os atributos específicos (hasattr) para detalhar a modalidade de pagamento[cite: 2]
             if hasattr(p, 'chave_pix'):
                 texto += f"Modalidade: PIX | Chave: {p.chave_pix}\n"
             elif hasattr(p, 'numero_cartao'):
@@ -114,10 +109,8 @@ class Tela_Pagamento:
         sg.popup_scrolled(texto, title="--- HISTÓRICO DE PAGAMENTOS ---", size=(50, 15), font=self.font_padrao)
 
     def seleciona_pagamento(self):
-        # Captura a Data ou ID do pagamento para seleção[cite: 2]
-        codigo = sg.popup_get_text("Digite a Data (ou ID) do pagamento que deseja selecionar:", title="Selecionar Pagamento", font=self.font_padrao)
+        codigo = sg.popup_get_text("Digite o ID do pagamento que deseja selecionar:", title="Selecionar Pagamento", font=self.font_padrao)
         return codigo
 
     def mostra_mensagem(self, msg):
-        # Padrão de mensagens do sistema[cite: 2]
         sg.popup(msg, title="Aviso do Sistema", font=self.font_padrao)

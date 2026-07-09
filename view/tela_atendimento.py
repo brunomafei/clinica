@@ -13,7 +13,6 @@ class Tela_Atendimento:
         self.font_titulo = ("Helvetica", 14, "bold")
 
     def tela_opcoes(self):
-        # Menu de Atendimento: Agendar, Alterar, Listar, Cancelar/Excluir, Retornar[cite: 10]
         layout = [
             [sg.Text("--- MENU ATENDIMENTO ---", font=self.font_titulo, justification='center', expand_x=True)],
             [sg.Button("1 - Agendar Atendimento", key=1, border_width=0, font=self.font_padrao, expand_x=True)],
@@ -48,7 +47,6 @@ class Tela_Atendimento:
 
         if event in (sg.WIN_CLOSED, "Cancelar"): return None
 
-        # Exige conversão para float no valor total e prevê erro[cite: 10]
         try:
             valor = float(values['valor_total'])
         except ValueError:
@@ -69,15 +67,14 @@ class Tela_Atendimento:
     def mostra_atendimento(self, atendimentos):
         texto = ""
         for a in atendimentos:
-            # Exibe data, horários, tipo e valor devido[cite: 10]
-            texto += f"Data: {a.data} | Horário: {a.horario_inicio} às {a.horario_fim}\n"
-            texto += f"Tipo: {a.tipo_atendimento} | Valor Devido: R$ {a.valor_total:.2f}\n"
+            # REQUISITO 6: Adicionada a exibição limpa do ID do atendimento na listagem
+            texto += f"ID: {a.id} | Data: {a.data} | Horário: {a.horario_inicio} às {a.horario_fim}\n"
+            texto += f"Tipo: {a.tipo} | Valor Devido: R$ {a.valor_total:.2f}\n"
             texto += "-" * 40 + "\n"
         sg.popup_scrolled(texto, title="--- Lista de Atendimentos ---", size=(50, 15), font=self.font_padrao)
 
     def seleciona_atendimento(self):
-        # Permite selecionar via DATA ou ID[cite: 10]
-        return sg.popup_get_text("Digite a DATA (ou ID) do atendimento que deseja selecionar:", title="Selecionar", font=self.font_padrao)
+        return sg.popup_get_text("Digite o ID do atendimento que deseja selecionar:", title="Selecionar", font=self.font_padrao)
 
     def mostra_mensagem(self, msg):
         sg.popup(msg, title="Aviso", font=self.font_padrao)

@@ -1,16 +1,16 @@
 from datetime import time
 
-
 class Clinica:
-
     def __init__(self,
                  nome: str,
+                 cnpj: str,
                  cidade: str,
                  descricao: str,
                  horario_abertura: time,
                  horario_fechamento: time):
 
         self.__nome = nome
+        self.__cnpj = cnpj
         self.__cidade = cidade
         self.__descricao = descricao
         self.__horario_abertura = horario_abertura
@@ -25,6 +25,14 @@ class Clinica:
         if novo_nome == "":
             raise ValueError("Nome inválido.")
         self.__nome = novo_nome
+        
+    @property
+    def cnpj(self):
+        return self.__cnpj
+
+    @cnpj.setter
+    def cnpj(self, novo_cnpj):
+        self.__cnpj = novo_cnpj
 
     @property
     def cidade(self):
@@ -68,4 +76,4 @@ class Clinica:
         )
 
     def __str__(self):
-        return f"Clínica: {self.__nome} - {self.__cidade}"
+        return f"Clínica: {self.__nome} (CNPJ: {self.__cnpj}) - {self.__cidade}"

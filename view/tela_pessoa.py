@@ -140,6 +140,43 @@ class TelaPessoa:
             return None
         return values["cpf"]
 
+    def pega_dados_alteracao_pessoa(self, pessoa):
+        # Novo método para interface gráfica que substitui o input() do terminal.
+        # Ele detecta se é Paciente ou Profissional e traz os dados antigos preenchidos.
+        eh_paciente = isinstance(pessoa, Paciente)
+
+        layout = [
+            [sg.Text("--- Alterar Dados ---", font=("Helvetica", 16, "bold"))],
+            [sg.Text("Nome:", size=(15, 1)), sg.InputText(pessoa.nome, key='nome')],
+            [sg.Text("Celular:", size=(15, 1)), sg.InputText(pessoa.celular, key='celular')],
+            [sg.Text("CPF:", size=(15, 1)), sg.InputText(pessoa.cpf, key='cpf')]
+        ]
+
+        if eh_paciente:
+            layout.append([sg.Text("Idade:", size=(15, 1)), sg.InputText(pessoa.idade, key='idade')])
+        else:
+            layout.append([sg.Text("Especialidade:", size=(15, 1)), sg.InputText(pessoa.especialidade, key='especialidade')])
+            layout.append([sg.Text("Registro:", size=(15, 1)), sg.InputText(pessoa.registro, key='registro')])
+
+        layout.append([sg.Button("Confirmar", key="Confirmar"), sg.Button("Cancelar", key="Cancelar")])
+
+        window = sg.Window("Alterar Pessoa", layout, modal=True, finalize=True)
+        event, values = window.read()
+        window.close()
+
+        if event in (None, "Cancelar"):
+            return None
+
+        # Valida se a nova idade digitada é um número inteiro
+        if eh_paciente:
+            try:
+                values['idade'] = int(values['idade'])
+            except ValueError:
+                self.mostra_mensagem("Erro: A idade deve ser um número inteiro!")
+                return None
+
+        return values
+
     def mostra_pessoas(self, pessoas):
         # Exibe a lista de pessoas cadastradas em uma janela rolável.
         # Útil para mostrar todos os cadastros de forma organizada.

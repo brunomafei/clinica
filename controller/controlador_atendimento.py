@@ -46,6 +46,17 @@ class ControladorAtendimento:
                     raise ElementoNaoExisteException(
                         "Paciente, Profissional ou Clínica não encontrados no sistema.")
 
+                # REQUISITO 1: Validação de maioridade do paciente
+                if paciente.idade < 18:
+                    raise ValueError("Somente pacientes com mais de 18 anos completos podem realizar atendimentos de forma independente.")
+
+                # REQUISITO 2: Validação de horário de funcionamento da clínica
+                if dados["hora_inicio"] < clinica.horario_abertura or dados["hora_fim"] > clinica.horario_fechamento:
+                    raise ValueError(f"O atendimento deve ocorrer dentro do período de funcionamento da clínica ({clinica.horario_abertura} às {clinica.horario_fechamento}).")
+
+                if dados["hora_inicio"] >= dados["hora_fim"]:
+                    raise ValueError("A hora de início deve ser menor que a hora de término.")
+
                 novo_atendimento = Atendimento(
                     clinica, paciente, profissional,
                     dados["data"], dados["hora_inicio"], dados["hora_fim"],
@@ -72,11 +83,16 @@ class ControladorAtendimento:
                 novos_dados = self.__tela_atendimento.pega_dados_atendimento()
 
                 if novos_dados is not None:
+                    # Validação de horário também na alteração baseada na clínica já associada
+                    if novos_dados["hora_inicio"] < atendimento.clinica.horario_abertura or novos_dados["hora_fim"] > atendimento.clinica.horario_fechamento:
+                        raise ValueError(f"O horário deve estar dentro do período de funcionamento da clínica ({atendimento.clinica.horario_abertura} às {atendimento.clinica.horario_fechamento}).")
+
                     atendimento.data = novos_dados["data"]
                     atendimento.horario_inicio = novos_dados["hora_inicio"]
                     atendimento.horario_fim = novos_dados["hora_fim"]
                     atendimento.tipo = novos_dados["tipo"]
                     atendimento.valor_total = novos_dados["valor_total"]
+                    
                     self.__atendimentos_dao.add(atendimento)
                     self.__tela_atendimento.mostra_mensagem(
                         "Atendimento alterado com sucesso!")
@@ -110,6 +126,4 @@ class ControladorAtendimento:
         return atendimentos
 
     def buscar_atendimento_por_id(self, id_buscado):
-        atendimento = self.__atendimentos_dao.get(id_buscado)
-        return atendimento
-        return None
+        return self.__atendimentos_dao.get(id_buscado)

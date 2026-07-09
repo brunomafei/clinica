@@ -105,74 +105,44 @@ class ControladorPessoa:
 
         pessoa = self.buscar_pessoa_por_cpf(cpf_antigo)
 
-        if pessoa is None:
-            self.__tela_pessoa.mostra_mensagem("Pessoa não encontrada.")
-            return
+        if pessoa is not None:
+            # Chamamos a tela em vez de usar input()
+            novos_dados = self.__tela_pessoa.pega_dados_alteracao_pessoa(pessoa)
 
-        # O fluxo de alteração depende do tipo da pessoa: paciente ou profissional.
-        if isinstance(pessoa, Paciente):
-            dados = self.__tela_pessoa.pega_dados_paciente()
-
-            if dados is not None:
+            if novos_dados is not None:
                 try:
-                    nova_idade = int(dados["idade"])
-                    novo_cpf = dados["cpf"]
-
-                    # Se o CPF mudou, é preciso garantir que ele não pertença
-                    # a outra pessoa.
-                    if (
-                        pessoa.cpf != novo_cpf
-                        and self.buscar_pessoa_por_cpf(novo_cpf) is not None
-                    ):
-                        raise ElementoRepetidoException(
-                            "O novo CPF informado já pertence a outra pessoa."
-                        )
-
-                    # Como o DAO usa o CPF como chave, é necessário remover a
-                    # entrada antiga antes de salvar a nova.
-                    self.__pessoas_dao.remove(cpf_antigo)
-
-                    # Atualiza os atributos do objeto em memória.
-                    pessoa.nome = dados["nome"]
-                    pessoa.celular = dados["celular"]
-                    pessoa.cpf = novo_cpf
-                    pessoa.idade = nova_idade
-
-                    # Reinsere o objeto no DAO com a chave atualizada, se o CPF
-                    # tiver sido alterado.
-                    self.__pessoas_dao.add(pessoa)
-                    self.__tela_pessoa.mostra_mensagem("Paciente alterado com sucesso.")
-
-                except ValueError:
-                    self.__tela_pessoa.mostra_mensagem(
-                        "Erro: A idade deve ser um número inteiro!"
-                    )
-                except ElementoRepetidoException as e:
-                    self.__tela_pessoa.mostra_mensagem(str(e))
-
-        elif isinstance(pessoa, Profissional):
-            dados = self.__tela_pessoa.pega_dados_profissional()
-
-            if dados is not None:
-                try:
-                    novo_cpf = dados["cpf"]
-
+                    novo_cpf = novos_dados["cpf"]
+                    # Verifica se mudou de CPF e se o novo já existe
                     if pessoa.cpf != novo_cpf and self.buscar_pessoa_por_cpf(novo_cpf) is not None:
-                        raise ElementoRepetidoException("O novo CPF informado já pertence a outra pessoa.")
+                        raise ElementoRepetidoException(
+                            "O novo CPF informado já pertence a outra pessoa.")
 
-                    self.__pessoas_dao.remove(cpf_antigo)
+                    # Se o CPF mudar, precisamos remover o registro antigo do DAO antes de salvar o novo
+                    cpf_antigo = pessoa.cpf
+                    if cpf_antigo != novo_cpf:
+                        self.__pessoas_dao.remove(cpf_antigo)
 
-                    pessoa.nome = dados["nome"]
-                    pessoa.celular = dados["celular"]
+                    pessoa.nome = novos_dados["nome"]
+                    pessoa.celular = novos_dados["celular"]
                     pessoa.cpf = novo_cpf
-                    pessoa.especialidade = dados["especialidade"]
-                    pessoa.registro = dados["registro"]
 
+                    if isinstance(pessoa, Paciente):
+                        pessoa.idade = novos_dados["idade"]
+
+                    elif isinstance(pessoa, Profissional):
+                        pessoa.especialidade = novos_dados["especialidade"]
+                        pessoa.registro = novos_dados["registro"]
+
+                    # Atualiza o objeto no DAO com a nova chave (CPF)
                     self.__pessoas_dao.add(pessoa)
-                    self.__tela_pessoa.mostra_mensagem("Profissional alterado com sucesso.")
 
-                except ElementoRepetidoException as e:
-                    self.__tela_pessoa.mostra_mensagem(str(e))
+                    self.__tela_pessoa.mostra_mensagem(
+                        "Pessoa alterada com sucesso.")
+                except ElementoRepetidoException:
+                    self.__tela_pessoa.mostra_mensagem(
+                        "Erro: Este elemento já existe. Tente novamente.")
+        else:
+            self.__tela_pessoa.mostra_mensagem("Pessoa não encontrada.")
 
     def remover_pessoa(self):
         """Remove uma pessoa do cadastro a partir do CPF informado."""
