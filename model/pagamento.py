@@ -8,8 +8,9 @@ class Pagamento(ABC):
             raise ValueError(
                 "Pagamento deve ser realizado até a data do atendimento.")
 
-        # ID amigável de 4 dígitos
-        self.__id = id_pagamento if id_pagamento else random.randint(1000, 9999)
+        # CORREÇÃO AQUI: Forçando o ID a ser sempre uma String (texto)
+        self.__id = str(id_pagamento) if id_pagamento else str(random.randint(1000, 9999))
+        
         self.__data = data
         self.__valor = valor
         self.__atendimento = atendimento
