@@ -2,26 +2,14 @@ import random
 from datetime import date, time
 
 class Atendimento:
-    def __init__(self,
-                 clinica,
-                 paciente,
-                 profissional,
-                 data: date,
-                 horario_inicio: time,
-                 horario_fim: time,
-                 tipo: str,
-                 valor_total: float,
-                 id_atendimento=None):
+    def __init__(self, clinica, paciente, profissional, data: date, horario_inicio: time, horario_fim: time, tipo: str, valor_total: float, id_atendimento=None):
 
-        # Regras de Negócio
         if not paciente.eh_maior_de_idade():
             raise ValueError("Somente pacientes com mais de 18 anos completos podem realizar atendimentos de forma independente.")
 
         if not clinica.horario_funcionamento(horario_inicio, horario_fim):
             raise ValueError("Atendimento fora do horário da clínica.")
 
-        # ID amigável de 4 dígitos
-        # Forçamos o ID a ser salvo como String (texto) para não perder zeros e bater com a tela
         self.__id = str(id_atendimento) if id_atendimento else str(random.randint(1000, 9999))
         self.__clinica = clinica
         self.__paciente = paciente
@@ -30,9 +18,11 @@ class Atendimento:
         self.__horario_inicio = horario_inicio
         self.__horario_fim = horario_fim
         self.__tipo = tipo
-        self.__valor_total = valor_total
         
-        # Eu crio essa lista vazia para armazenar os procedimentos que foram realizados especificamente durante este atendimento.
+        # O valor base da consulta agora é sagrado e não muda mais!
+        self.__valor_total = valor_total
+        # Eu crio essa variável para rastrear apenas o que já foi pago
+        self.__valor_pago = 0.0 
         self.__procedimentos = []
 
     @property
@@ -107,12 +97,31 @@ class Atendimento:
 
     @property
     def procedimentos(self):
-        # Eu retorno a lista de procedimentos vinculados ao atendimento.
         return self.__procedimentos
 
     def adicionar_procedimento(self, procedimento):
-        # Eu adiciono o procedimento passado por parâmetro à lista deste atendimento.
         self.__procedimentos.append(procedimento)
+
+    # ---- NOVOS MÉTODOS CONTÁBEIS ABAIXO ----
+
+    @property
+    def valor_pago(self):
+        return self.__valor_pago
+
+    @valor_pago.setter
+    def valor_pago(self, valor):
+        self.__valor_pago = valor
+
+    @property
+    def custo_total(self):
+        # O custo real do atendimento soma o valor base + o custo de todos os procedimentos
+        custo_procedimentos = sum(proc.custo for proc in self.__procedimentos)
+        return self.__valor_total + custo_procedimentos
+
+    @property
+    def valor_restante(self):
+        # O saldo devedor é calculado na hora: Custo Total menos o que já foi pago
+        return self.custo_total - self.__valor_pago
 
     def __str__(self):
         return f"{self.__tipo} - {self.__data}"

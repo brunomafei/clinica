@@ -34,8 +34,9 @@ class ControladorRelatorio:
             raise ElementoNaoExisteException(
                 "Nenhum atendimento encontrado para gerar o relatório.")
 
+        # A ALTERAÇÃO ESTÁ AQUI: Agora ele ordena pelo "custo_total" verdadeiro!
         atendimentos_ordenados = sorted(
-            atendimentos, key=lambda a: a.valor_total)
+            atendimentos, key=lambda a: a.custo_total)
 
         mais_barato = atendimentos_ordenados[0]
         mais_caro = atendimentos_ordenados[-1]
@@ -43,7 +44,6 @@ class ControladorRelatorio:
         return mais_caro, mais_barato
 
     def relatorio_procedimentos_mais_realizados(self):
-        # Eu pego os atendimentos, pois é lá que os procedimentos estão registrados de fato.
         atendimentos = self.__controlador_atendimento.listar_atendimentos()
 
         if not atendimentos:
@@ -51,17 +51,14 @@ class ControladorRelatorio:
 
         contagem_de_procedimentos = {}
 
-        # Eu percorro todos os atendimentos e, em seguida, percorro a lista de procedimentos dentro de cada um deles.
         for atendimento in atendimentos:
             for procedimento in atendimento.procedimentos:
                 descricao = procedimento.descricao
-                # Eu conto a frequência com que cada procedimento aparece nos atendimentos reais.
                 contagem_de_procedimentos[descricao] = contagem_de_procedimentos.get(descricao, 0) + 1
 
         if not contagem_de_procedimentos:
             raise ElementoNaoExisteException("Nenhum procedimento foi realizado nos atendimentos agendados.")
 
-        # Eu ordeno os procedimentos pela frequência em ordem decrescente para o relatório.
         ordena_procedimentos = sorted(contagem_de_procedimentos.items(), key=lambda x: x[1], reverse=True)
         return ordena_procedimentos
 

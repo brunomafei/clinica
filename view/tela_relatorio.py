@@ -13,7 +13,6 @@ class TelaRelatorio:
         self.font_titulo = ("Helvetica", 14, "bold")
 
     def tela_opcoes(self):
-        # Menu com as opções 1 a 4 de relatórios e 0 para voltar[cite: 9]
         layout = [
             [sg.Text("--- RELATÓRIOS ---", font=self.font_titulo, justification='center', expand_x=True)],
             [sg.Button("1. Clínicas com mais atendimentos", key=1, border_width=0, font=self.font_padrao, expand_x=True)],
@@ -33,7 +32,6 @@ class TelaRelatorio:
         sg.popup(mensagem, title="Aviso", font=self.font_padrao)
 
     def mostra_relatorio_clinicas_mais_atendimentos(self, relatorio):
-        # Exibe o nome da clínica e quantidade de atendimentos[cite: 9]
         if not relatorio:
             self.mostra_mensagem("Nenhum dado encontrado para este relatório.")
             return
@@ -44,13 +42,12 @@ class TelaRelatorio:
         sg.popup_scrolled(texto, title="Clínicas com mais atendimentos", size=(40, 10), font=self.font_padrao)
 
     def mostra_relatorio_atendimentos_mais_caros_eh_baratos(self, mais_caro, mais_barato):
-        # Exibe os dados do atendimento mais caro e do mais barato (Clínica e Valor)[cite: 9]
-        texto = f"Mais caro: Clínica {mais_caro.clinica.nome} | Valor: {mais_caro.valor_total}\n\n"
-        texto += f"Mais barato: Clínica {mais_barato.clinica.nome} | Valor: {mais_barato.valor_total}"
+        # ATUALIZAÇÃO: Puxando o "custo_total" para o relatório refletir a realidade
+        texto = f"Mais caro: Clínica {mais_caro.clinica.nome} | Custo Total: R$ {mais_caro.custo_total:.2f}\n\n"
+        texto += f"Mais barato: Clínica {mais_barato.clinica.nome} | Custo Total: R$ {mais_barato.custo_total:.2f}"
         sg.popup(texto, title="Atendimentos mais caros e mais baratos", font=self.font_padrao)
 
     def mostra_relatorio_procedimentos_mais_realizados(self, relatorio):
-        # Exibe a descrição do procedimento e sua quantidade[cite: 9]
         if not relatorio:
             self.mostra_mensagem("Nenhum dado encontrado para este relatório.")
             return
@@ -61,7 +58,6 @@ class TelaRelatorio:
         sg.popup_scrolled(texto, title="Procedimentos mais realizados", size=(40, 10), font=self.font_padrao)
 
     def mostra_relatorio_procedimentos_mais_caros_eh_baratos(self, mais_caro, mais_barato):
-        # Exibe o custo e descrição do procedimento mais caro e mais barato[cite: 9]
-        texto = f"Mais caro: {mais_caro.descricao} | Custo: {mais_caro.custo}\n\n"
-        texto += f"Mais barato: {mais_barato.descricao} | Custo: {mais_barato.custo}"
+        texto = f"Mais caro: {mais_caro.descricao} | Custo: R$ {mais_caro.custo:.2f}\n\n"
+        texto += f"Mais barato: {mais_barato.descricao} | Custo: R$ {mais_barato.custo:.2f}"
         sg.popup(texto, title="Procedimentos mais caros e mais baratos", font=self.font_padrao)

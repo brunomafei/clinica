@@ -19,7 +19,7 @@ class ControladorPagamento:
 
         while True:
             opcao = self.__tela_pagamento.tela_opcoes()
-            if opcao == 0:
+            if opcao in (0, -1):
                 break
 
             funcao = lista_opcoes.get(opcao)
@@ -48,13 +48,15 @@ class ControladorPagamento:
                     if data_pagamento > data_atendimento:
                         raise ValueError("O pagamento deve ser realizado até a data do atendimento.")
                 except ValueError as ve:
-                    # Captura tanto o erro da nossa regra de negócio quanto formato de data inválido
                     raise ValueError(f"Erro de data: {ve}. Certifique-se de usar o formato DD/MM/AAAA.")
+
+                # REQUISITO: Não deixar pagar mais do que o saldo devedor
+                if dados["valor"] > atendimento.valor_restante:
+                    raise ValueError(f"O valor do pagamento (R$ {dados['valor']:.2f}) não pode ser maior que o saldo devedor (R$ {atendimento.valor_restante:.2f}).")
 
                 novo_pagamento = None
                 tipo = dados["tipo"]
 
-                # REQUISITO 8: Instanciação usando o padrão PEP8
                 if tipo == "PIX":
                     novo_pagamento = PagamentoPix(
                         dados["data"], dados["valor"], dados["chave_pix"], atendimento)
@@ -69,13 +71,13 @@ class ControladorPagamento:
 
                 self.__pagamentos_dao.add(novo_pagamento)
                 
-                # Atualiza o valor total do atendimento (verifique se na model o setter está configurado)
-                atendimento.valor_total -= dados["valor"]
-                # Atualiza o atendimento no DAO de atendimentos para salvar o novo valor
+                # A MÁGICA ACONTECE AQUI: Somamos no valor_pago em vez de subtrair do valor_total
+                atendimento.valor_pago += dados["valor"]
+                
                 self.__controlador_atendimento._ControladorAtendimento__atendimentos_dao.add(atendimento)
                 
                 self.__tela_pagamento.mostra_mensagem(
-                    f"Pago! Valor restante: R${atendimento.valor_total:.2f}")
+                    f"Pago! Saldo devedor restante: R$ {atendimento.valor_restante:.2f}")
 
             except Exception as e:
                 self.__tela_pagamento.mostra_mensagem(f"Erro: {e}")
