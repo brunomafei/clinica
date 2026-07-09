@@ -12,6 +12,20 @@ class TelaPessoa:
         except Exception:
             pass
 
+    def _validar_cpf(self, cpf):
+        """Valida CPF simples: deve ter exatamente 11 dígitos."""
+        # Remove qualquer caractere que não seja número, para aceitar entradas como pontos ou traços.
+        cpf = "".join(filter(str.isdigit, cpf or ""))
+        # A regra simples é verificar se sobraram exatamente 11 números.
+        return len(cpf) == 11
+
+    def _validar_telefone(self, telefone):
+        """Valida telefone simples: deve ter 10 ou 11 dígitos."""
+        # Também remove caracteres não numéricos para deixar a validação mais flexível.
+        telefone = "".join(filter(str.isdigit, telefone or ""))
+        # Aceita telefones fixos ou celulares, desde que tenham 10 ou 11 números.
+        return len(telefone) in (10, 11)
+
     def tela_opcoes(self):
         # Exibe as opções de gerenciamento de pessoas.
         # Esse menu direciona o fluxo para cadastro, alteração, listagem ou remoção.
@@ -37,56 +51,78 @@ class TelaPessoa:
 
     def pega_dados_paciente(self):
         # Coleta os dados de cadastro de um paciente.
-        # Os valores são retornados em uma estrutura simples para o controlador.
-        layout = [
-            [sg.Text("Cadastro de Paciente", font=("Helvetica", 16, "bold"))],
-            [sg.Text("Nome"), sg.Input(key="nome")],
-            [sg.Text("Idade"), sg.Input(key="idade")],
-            [sg.Text("Celular"), sg.Input(key="celular")],
-            [sg.Text("CPF"), sg.Input(key="cpf")],
-            [sg.Button("Salvar", key="salvar"), sg.Button("Cancelar", key="cancelar")],
-        ]
-
         while True:
+            layout = [
+                [sg.Text("Cadastro de Paciente", font=("Helvetica", 16, "bold"))],
+                [sg.Text("Nome"), sg.Input(key="nome")],
+                [sg.Text("Idade"), sg.Input(key="idade")],
+                [sg.Text("Celular"), sg.Input(key="celular")],
+                [sg.Text("CPF"), sg.Input(key="cpf")],
+                [sg.Button("Salvar"), sg.Button("Cancelar")],
+            ]
+
             window = sg.Window("Cadastro de Paciente", layout, modal=True, finalize=True)
             event, values = window.read()
             window.close()
 
-            # Se o usuário cancelar, interrompe o cadastro.
-            if event in (None, "cancelar"):
+            if event in (None, "Cancelar"):
                 return None
 
-            # Se salvar, valida a idade e retorna os dados digitados.
-            if event == "salvar":
-                try:
-                    idade = int(values["idade"])
-                    return values["nome"], idade, values["celular"], values["cpf"]
-                except ValueError:
-                    self.mostra_mensagem("Digite uma idade válida.")
+            if event == "Salvar":
+                # Pega os dados digitados no formulário do paciente.
+                cpf = values.get("cpf", "")
+                telefone = values.get("celular", "")
+
+                # Valida o CPF antes de continuar.
+                if not self._validar_cpf(cpf):
+                    sg.popup("CPF inválido. Digite 11 números.", title="Erro")
+                    continue
+
+                # Valida o telefone antes de continuar.
+                if not self._validar_telefone(telefone):
+                    sg.popup("Telefone inválido. Digite 10 ou 11 números.", title="Erro")
+                    continue
+
+                # Se tudo estiver correto, os dados são enviados para o controlador.
+                return values
 
     def pega_dados_profissional(self):
         # Coleta os dados de cadastro de um profissional.
-        # Os campos são reunidos em uma tupla para uso posterior.
-        layout = [
-            [sg.Text("Cadastro de Profissional", font=("Helvetica", 16, "bold"))],
-            [sg.Text("Nome"), sg.Input(key="nome")],
-            [sg.Text("Celular"), sg.Input(key="celular")],
-            [sg.Text("CPF"), sg.Input(key="cpf")],
-            [sg.Text("Especialidade"), sg.Input(key="especialidade")],
-            [sg.Text("Registro"), sg.Input(key="registro")],
-            [sg.Button("Salvar", key="salvar"), sg.Button("Cancelar", key="cancelar")],
-        ]
+        while True:
+            layout = [
+                [sg.Text("Cadastro de Profissional", font=("Helvetica", 16, "bold"))],
+                [sg.Text("Nome"), sg.Input(key="nome")],
+                [sg.Text("Celular"), sg.Input(key="celular")],
+                [sg.Text("CPF"), sg.Input(key="cpf")],
+                [sg.Text("Especialidade"), sg.Input(key="especialidade")],
+                [sg.Text("Registro"), sg.Input(key="registro")],
+                [sg.Button("Salvar"), sg.Button("Cancelar")],
+            ]
 
-        window = sg.Window("Cadastro de Profissional", layout, modal=True, finalize=True)
-        event, values = window.read()
-        window.close()
+            window = sg.Window("Cadastro de Profissional", layout, modal=True, finalize=True)
+            event, values = window.read()
+            window.close()
 
-        # Se o usuário cancelar, retorna None para encerrar o fluxo.
-        if event in (None, "cancelar"):
-            return None
+            if event in (None, "Cancelar"):
+                return None
 
-        # Retorna os dados coletados em ordem esperada pelo controlador.
-        return values["nome"], values["celular"], values["cpf"], values["especialidade"], values["registro"]
+            if event == "Salvar":
+                # Pega os valores digitados na tela de profissional.
+                cpf = values.get("cpf", "")
+                telefone = values.get("celular", "")
+
+                # Valida CPF antes de prosseguir.
+                if not self._validar_cpf(cpf):
+                    sg.popup("CPF inválido. Digite 11 números.", title="Erro")
+                    continue
+
+                # Valida telefone antes de prosseguir.
+                if not self._validar_telefone(telefone):
+                    sg.popup("Telefone inválido. Digite 10 ou 11 números.", title="Erro")
+                    continue
+
+                # Se tudo estiver correto, envia os dados adiante.
+                return values
 
     def seleciona_cpf(self):
         # Solicita o CPF de uma pessoa para alteração ou remoção.
