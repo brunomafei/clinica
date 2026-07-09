@@ -1,7 +1,6 @@
-import uuid
+import random
 from abc import ABC, abstractmethod
 from datetime import date
-
 
 class Pagamento(ABC):
     def __init__(self, data: date, valor: float, atendimento=None, id_pagamento=None):
@@ -9,7 +8,8 @@ class Pagamento(ABC):
             raise ValueError(
                 "Pagamento deve ser realizado até a data do atendimento.")
 
-        self.__id = id_pagamento if id_pagamento else str(uuid.uuid4())
+        # ID amigável de 4 dígitos
+        self.__id = id_pagamento if id_pagamento else random.randint(1000, 9999)
         self.__data = data
         self.__valor = valor
         self.__atendimento = atendimento

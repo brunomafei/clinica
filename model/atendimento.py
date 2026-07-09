@@ -1,6 +1,5 @@
-import uuid
+import random
 from datetime import date, time
-
 
 class Atendimento:
     def __init__(self,
@@ -21,7 +20,8 @@ class Atendimento:
         if not clinica.horario_funcionamento(horario_inicio, horario_fim):
             raise ValueError("Atendimento fora do horário da clínica.")
 
-        self.__id = id_atendimento if id_atendimento else str(uuid.uuid4())
+        # ID amigável de 4 dígitos
+        self.__id = id_atendimento if id_atendimento else random.randint(1000, 9999)
         self.__clinica = clinica
         self.__paciente = paciente
         self.__profissional = profissional
